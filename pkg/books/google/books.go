@@ -3,6 +3,7 @@ package googlebooks
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"time"
 
 	bookscommon "github.com/BookManagementSystem/pkg/books/common"
@@ -53,6 +54,11 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 		date, err := StringToDate(volume.VolumeInfo.PublishedDate)
 		if err == nil {
 			book.Publishdate = date
+		}
+
+		url, err := url.Parse(volume.VolumeInfo.ImageLinks.Thumbnail)
+		if err == nil {
+			book.Image = *url
 		}
 
 		return book, nil

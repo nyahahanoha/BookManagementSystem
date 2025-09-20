@@ -1,6 +1,7 @@
 package bookscommon
 
 import (
+	"net/url"
 	"time"
 )
 
@@ -19,4 +20,5 @@ type Info struct {
 	Description string
 	Publishdate time.Time
 	Language    Language
+	Image       url.URL
 }
