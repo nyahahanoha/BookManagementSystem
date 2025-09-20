@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+//go:generate go run github.com/dmarkham/enumer -type=Language
 type Language int32
 
 const (
