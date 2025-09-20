@@ -14,9 +14,14 @@ type Books interface {
 }
 
 func NewBooks(config booksconfig.Config) (Books, error) {
-	books, err := googlebooks.NewGoogleBooks(config.Google)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create books: %w", err)
+	switch config.Kind {
+	case booksconfig.Google:
+		books, err := googlebooks.NewGoogleBooks(config.Google)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create books: %w", err)
+		}
+		return books, nil
+	default:
+		return nil, fmt.Errorf("failed to create books: Unknown Compoent")
 	}
-	return books, nil
 }
