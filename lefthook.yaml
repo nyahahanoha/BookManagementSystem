@@ -1,0 +1,45 @@
+---
+# EXAMPLE USAGE:
+#
+#   Refer for explanation to following link:
+#   https://lefthook.dev/configuration/
+#
+# pre-push:
+#   jobs:
+#     - name: packages audit
+#       tags:
+#         - frontend
+#         - security
+#       run: yarn audit
+#
+#     - name: gems audit
+#       tags:
+#         - backend
+#         - security
+#       run: bundle audit
+#
+
+pre-commit:
+  parallel: true
+  files: git diff --name-only --cached
+  jobs:
+    - name: govet
+      glob: "*.go"
+      run: go vet {files}
+    - name: gofmt
+      glob: "*.go"
+      run: go fmt -l {files}
+    - name: goimports
+      glob: "*.go"
+      run: goimports -l {files}
+    - name: golangci-lint
+      glob: "*.go"
+      run: golangci-lint run ./...
+
+    - name: yamllint
+      glob: "*.yaml"
+      run: yamllint {files}
+
+    - name: tomllint
+      glob: "*.toml"
+      run: taplo lint {files}

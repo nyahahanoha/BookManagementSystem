@@ -1,4 +1,9 @@
 [tools]
-go="latest"
-pre-commit="latest"
-golangci-lint="latest"
+go = "latest"
+pre-commit = "latest"
+golangci-lint = "latest"
+lefthook = "latest"
+yamlfmt = "latest"
+pipx = "latest"
+yamllint = "latest"
+taplo = "latest"
