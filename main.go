@@ -15,6 +15,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("failed to create service: %v", err)
 		os.Exit(1)
+	}
 
 	volumes, err := svc.Volumes.List("isbn:9784091932518").Do()
 	if err != nil {

@@ -1,3 +1,5 @@
+version: "2"
+
 run:
   timeout: 3m
   tests: true
@@ -8,26 +10,19 @@ linters:
   enable:
     - govet       # 標準の vet チェック
     - staticcheck # より強力な静的解析
-    - gofmt       # コードフォーマット
-    - goimports   # import 整理
     - errcheck    # エラーハンドリング漏れ
     - unused      # 未使用コード
 
-linters-settings:
-  gofmt:
-    simplify: true
-
-  goimports:
-    local-prefixes: github.com/your-org/your-repo
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes: github.com/nyahahanoha/BookManagementSystem
 
 issues:
-  exclude-use-default: false
   max-issues-per-linter: 0
   max-same-issues: 0
-
-output:
-  formats:
-    - format: colored-line-number
-  print-issued-lines: true
-  print-linter-name: true
-
