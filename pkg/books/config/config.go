@@ -2,7 +2,7 @@ package booksconfig
 
 type Config struct {
 	Kind   BooksComponent    `yaml:"kind"`
-	Google GoogleBooksConfig `yaml:"google_api"`
+	Google GoogleBooksConfig `yaml:"google"`
 }
 
 //go:generate go run github.com/dmarkham/enumer -type=BooksComponent -yaml

@@ -5,7 +5,7 @@ type DBConfig struct {
 	MySQLConfig MySQLConfig `yaml:"mysql"`
 }
 
-//go:generate go run github.com/dmarkham/enumer -type=Language -yaml
+//go:generate go run github.com/dmarkham/enumer -type=DBComponent -yaml
 type DBComponent uint32
 
 const (
