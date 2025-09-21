@@ -78,7 +78,7 @@ func (s *Bluetooth) Close() error {
 	return s.device.Disconnect()
 }
 
-func (s *Bluetooth) Wait(ch chan scannercommon.Result) error {
+func (s *Bluetooth) Run(ch chan scannercommon.Result) error {
 	services, err := s.device.DiscoverServices(nil)
 	if err != nil {
 		return fmt.Errorf("failed to discover service: %w", err)

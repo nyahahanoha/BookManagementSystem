@@ -10,7 +10,7 @@ import (
 )
 
 type Scanner interface {
-	Wait(ch chan scannercommon.Result) error
+	Run(ch chan scannercommon.Result) error
 	Close() error
 }
 
