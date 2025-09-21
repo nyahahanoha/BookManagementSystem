@@ -2,6 +2,7 @@ package scanner
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/BookManagementSystem/pkg/scanner/bluetooth"
 	scannercommon "github.com/BookManagementSystem/pkg/scanner/common"
@@ -13,10 +14,10 @@ type Scanner interface {
 	Close() error
 }
 
-func NewScanner(config scannerconfig.Config) (Scanner, error) {
+func NewScanner(lg *slog.Logger, config scannerconfig.Config) (Scanner, error) {
 	switch config.Kind {
 	case scannerconfig.Bluetooth:
-		bluetooth, err := bluetooth.NewBluetooth(config.Bluetooth)
+		bluetooth, err := bluetooth.NewBluetooth(lg, config.Bluetooth)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create bluetooth: %w", err)
 		}

@@ -8,6 +8,7 @@ type Config struct {
 	Bluetooth BluetoothConfig  `yaml:"bluetooth"`
 }
 
+//go:generate go run github.com/dmarkham/enumer -type=ScannerComponent -yaml
 type ScannerComponent uint32
 
 const (
