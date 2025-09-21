@@ -21,5 +21,10 @@ type Info struct {
 	Description string
 	Publishdate time.Time
 	Language    Language
-	Image       url.URL
+	Image       Image
+}
+
+type Image struct {
+	Source url.URL
+	Path   string
 }

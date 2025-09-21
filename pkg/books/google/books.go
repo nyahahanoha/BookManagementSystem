@@ -59,7 +59,7 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 
 		url, err := url.Parse(volume.VolumeInfo.ImageLinks.Thumbnail)
 		if err == nil {
-			book.Image = *url
+			book.Image.Source = *url
 		}
 
 		return book, nil

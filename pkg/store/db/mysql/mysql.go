@@ -99,7 +99,7 @@ func (s *MySQL) Put(book bookscommon.Info) error {
 		book.Description,
 		book.Publishdate,
 		book.Language.String(),
-		book.Image.String(),
+		book.Image.Source.String(),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to execute query: %w", err)
@@ -155,7 +155,7 @@ func (s *MySQL) Get(isbn string) (*bookscommon.Info, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get image url: %w", err)
 	}
-	book.Image = *imgurl
+	book.Image.Source = *imgurl
 
 	rows, err := s.db.Query(`SELECT author FROM authors WHERE isbn = ?`, isbn)
 	if err != nil {
