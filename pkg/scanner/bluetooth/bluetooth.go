@@ -26,7 +26,6 @@ func NewBluetooth(config scannerconfig.BluetoothConfig) (*Bluetooth, error) {
 	ch := make(chan ble.ScanResult, 1)
 	if err := adapter.Scan(func(adapter *ble.Adapter, result ble.ScanResult) {
 		if result.LocalName() == config.Name {
-			adapter.StopScan()
 			ch <- result
 		}
 	}); err != nil {
@@ -35,6 +34,9 @@ func NewBluetooth(config scannerconfig.BluetoothConfig) (*Bluetooth, error) {
 
 	select {
 	case result := <-ch:
+		if err := adapter.StopScan(); err != nil {
+			return nil, fmt.Errorf("failed to stop scan: %w", err)
+		}
 		device, err := adapter.Connect(result.Address, ble.ConnectionParams{})
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect bluetooth scanner: %w", err)
@@ -53,8 +55,7 @@ func NewBluetooth(config scannerconfig.BluetoothConfig) (*Bluetooth, error) {
 
 func (s *Bluetooth) Close() error {
 	close(s.closech)
-	s.device.Disconnect()
-	return nil
+	return s.device.Disconnect()
 }
 
 func (s *Bluetooth) Wait(ch chan scannercommon.Result) error {
