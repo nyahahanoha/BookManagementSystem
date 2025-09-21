@@ -1,29 +1,45 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	"log"
+	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"google.golang.org/api/books/v1"
-	"google.golang.org/api/option"
+	"github.com/BookManagementSystem/pkg/config"
+	"github.com/BookManagementSystem/pkg/service"
+	"gopkg.in/yaml.v3"
 )
 
 func main() {
-	ctx := context.Background()
-	svc, err := books.NewService(ctx, option.WithAPIKey(os.Getenv("TOKEN")))
+	file, err := os.ReadFile("config.yaml")
 	if err != nil {
-		fmt.Printf("failed to create service: %v", err)
-		os.Exit(1)
+		log.Fatalf("failed to reaf yaml file: %v", err)
 	}
 
-	volumes, err := svc.Volumes.List("isbn:9784091932518").Do()
-	if err != nil {
-		fmt.Printf("failed to request service: %v", err)
-		os.Exit(1)
+	var cfg config.Config
+	if err := yaml.Unmarshal(file, &cfg); err != nil {
+		log.Fatalf("failed to unmarshal yaml file: %v", err)
 	}
 
-	if volumes.TotalItems > 0 {
-		fmt.Printf("%+v\n", volumes.Items[0])
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	service, err := service.NewBooksService(logger, cfg)
+	if err != nil {
+		log.Fatalf("failed to create service: %v", err)
+	}
+
+	go func() {
+		if err := service.Run(); err != nil {
+			logger.Error("failed to service", slog.String("err", err.Error()))
+		}
+	}()
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	<-sigs
+	if err := service.Close(); err != nil {
+		log.Fatalf("failed to close service: %v", err)
 	}
 }
