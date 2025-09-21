@@ -24,7 +24,6 @@ type Bluetooth struct {
 var adapter = ble.DefaultAdapter
 
 func NewBluetooth(lg *slog.Logger, config scannerconfig.BluetoothConfig) (*Bluetooth, error) {
-	lg.With(slog.String("Package", "bluetooth"))
 	if err := adapter.Enable(); err != nil {
 		return nil, fmt.Errorf("failed to create bluetooth adapater: %w", err)
 	}
@@ -60,7 +59,7 @@ func NewBluetooth(lg *slog.Logger, config scannerconfig.BluetoothConfig) (*Bluet
 		}
 
 		return &Bluetooth{
-			lg:                 lg,
+			lg:                 lg.With(slog.String("Package", "bluetooth")),
 			ServiceUUID:        config.ServiceUUID,
 			CharacteristicUUID: config.CharacteristicUUID,
 			device:             device,
