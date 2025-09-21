@@ -32,8 +32,6 @@ pre-commit:
     - name: goimports
       glob: "*.go"
       run: goimports -l {files}
-    - name: test
-      run: echo "{files}"
     - name: golangci-lint
       glob: "*.go"
       run: |
@@ -41,9 +39,9 @@ pre-commit:
           $(git diff --cached --name-only --diff-filter=ACM \
             | grep '\.go$' \
             | xargs -n1 dirname \
-            | sort -u
-          )
-        ; do
+            | sort -u \
+          ) \
+        ;do
           golangci-lint run --whole-files $dir
         done
 
