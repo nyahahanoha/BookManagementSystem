@@ -47,7 +47,7 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 		book := &bookscommon.Info{
 			ISBN:        isbn,
 			Title:       volume.VolumeInfo.Title,
-			Authoers:    volume.VolumeInfo.Authors,
+			Authors:     volume.VolumeInfo.Authors,
 			Description: volume.VolumeInfo.Description,
 			Language:    StringToLanguage(volume.VolumeInfo.Language),
 		}

@@ -17,7 +17,7 @@ const (
 type Info struct {
 	ISBN        string
 	Title       string
-	Authoers    []string
+	Authors     []string
 	Description string
 	Publishdate time.Time
 	Language    Language
