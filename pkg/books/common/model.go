@@ -15,6 +15,7 @@ const (
 )
 
 type Info struct {
+	ISBN        string
 	Title       string
 	Authoers    []string
 	Description string
