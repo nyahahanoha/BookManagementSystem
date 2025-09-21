@@ -23,18 +23,29 @@ pre-commit:
   parallel: true
   files: git diff --name-only --cached
   jobs:
-    - name: govet
-      glob: "*.go"
-      run: go vet {files}
     - name: gofmt
       glob: "*.go"
-      run: go fmt -l {files}
+      run: go fmt ./...
+    - name: govet
+      glob: "*.go"
+      run: go vet ./...
     - name: goimports
       glob: "*.go"
       run: goimports -l {files}
+    - name: test
+      run: echo "{files}"
     - name: golangci-lint
       glob: "*.go"
-      run: golangci-lint run ./...
+      run: |
+        for dir in \
+          $(git diff --cached --name-only --diff-filter=ACM \
+            | grep '\.go$' \
+            | xargs -n1 dirname \
+            | sort -u
+          )
+        ; do
+          golangci-lint run --whole-files $dir
+        done
 
     - name: yamllint
       glob: "*.yaml"
