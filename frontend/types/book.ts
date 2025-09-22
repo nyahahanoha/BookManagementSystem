@@ -25,8 +25,8 @@ export interface BookInfo {
 }
 
 export interface BooksResponse {
-  Books: BookInfo[] | null;
-  Count: number;
+  books: BookInfo[] | null;
+  count: number;
 }
 
 export const LanguageMap = {

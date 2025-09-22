@@ -1,13 +1,13 @@
 import { useEffect, useState } from "preact/hooks";
 import { BookInfo } from "../types/book.ts";
 
-export default function BookCard({ book }: { book: BookInfo }) {
-  const title = book.title || book.Title;
-  const authors = book.authors || book.Authors;
-  const description = book.description || book.Description;
-  const imageFileName = book.image?.Path || book.Image?.Path;
-  const isbn = book.isbn || book.ISBN;
-  const publishdate = book.publishdate || book.Publishdate;
+export default function BookCard({ book, onDelete }: { book: BookInfo, onDelete?: (isbn: string) => void }) {
+  const title = book.Title;
+  const authors = book.Authors;
+  const description = book.Description;
+  const imageFileName =  book.Image?.Path;
+  const isbn = book.ISBN;
+  const publishdate = book.Publishdate;
 
   const [imageUrl, setImageUrl] = useState<string>("");
 
@@ -21,11 +21,21 @@ export default function BookCard({ book }: { book: BookInfo }) {
 
   let yearMonth = "";
   if (publishdate) {
-    const [year, month] = publishdate.split("-"); // "YYYY-MM-DD"
+    const [year, month] = publishdate.split("-");
     if (year && month) {
       yearMonth = `${year}-${month}`;
     }
   }
+
+  const handleDelete = async () => {
+    if (!isbn) return;
+    const res = await fetch(`http://localhost:8080/book:${isbn}`, {
+      method: "DELETE",
+    });
+    if (res.ok && onDelete) {
+      onDelete(isbn);
+    }
+  };
 
   return (
     <div class="bookcard-dark">
@@ -44,6 +54,9 @@ export default function BookCard({ book }: { book: BookInfo }) {
           <span class="bookcard-isbn">ISBN: {isbn}</span>
           <span class="bookcard-date">{yearMonth}</span>
         </div>
+        <button class="bookcard-delete-btn" onClick={handleDelete}>
+          Delete
+        </button>
       </div>
     </div>
   );

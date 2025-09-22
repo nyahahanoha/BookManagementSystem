@@ -51,6 +51,7 @@ export default function BookManager() {
       } else {
         response = await BookAPI.searchBooksByTitle(query);
       }
+      console.log("Search response:", response);
       setSearchResults(response.books || []);
     } catch (err) {
       setError("Search failed. Please try again.");
@@ -99,7 +100,7 @@ export default function BookManager() {
           ) : (
             <div class="bookmanager-grid">
               {displayBooks.map((book) => (
-                <BookCard key={book.isbn || book.ISBN} book={book} />
+                <BookCard key={book.ISBN} book={book} />
               ))}
             </div>
           )}
