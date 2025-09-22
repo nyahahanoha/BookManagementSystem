@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 
 	storeconfig "github.com/BookManagementSystem/pkg/store/config"
 )
@@ -65,5 +66,15 @@ func (s *FileStore) Put(url url.URL, isbn string) error {
 }
 
 func (s *FileStore) Get(isbn string) (string, error) {
-	return path.Join(s.prefix, isbn), nil
+	entries, err := os.ReadDir(s.prefix)
+	if err != nil {
+		return "", fmt.Errorf("failed to read dir: %w", err)
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() && strings.Contains(entry.Name(), isbn) {
+			return path.Join(s.prefix, entry.Name()), nil
+		}
+	}
+	return "", nil
 }
