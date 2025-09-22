@@ -1,129 +1,324 @@
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-* {
-  margin: 0;
-}
-button {
-  color: inherit;
-}
-button, [role="button"] {
-  cursor: pointer;
-}
-code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
-  font-size: 1em;
-}
-img,
-svg {
-  display: block;
-}
-img,
-video {
-  max-width: 100%;
-  height: auto;
+/* 全体背景 */
+.index-dark-bg {
+  min-height: 100vh;
+  background: linear-gradient(120deg, #181e2a 0%, #223a5f 100%);
+  font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
 }
 
-html {
-  line-height: 1.5;
-  -webkit-text-size-adjust: 100%;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+/* BookManager */
+.bookmanager-bg {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem 1rem;
 }
-.transition-colors {
-  transition-property: background-color, border-color, color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+
+.bookmanager-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
-.my-6 {
-  margin-bottom: 1.5rem;
-  margin-top: 1.5rem;
+
+.bookmanager-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #eaf6ff;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 8px #0008;
 }
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
+
+.bookmanager-search {
+  margin-bottom: 2rem;
 }
-.mx-2 {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-}
-.my-4 {
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-}
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-.py-8 {
-  padding-bottom: 2rem;
-  padding-top: 2rem;
-}
-.bg-\[\#86efac\] {
-  background-color: #86efac;
-}
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-}
-.py-6 {
-  padding-bottom: 1.5rem;
-  padding-top: 1.5rem;
-}
-.px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-.py-1 {
-  padding-bottom: 0.25rem;
-  padding-top: 0.25rem;
-}
-.border-gray-500 {
-  border-color: #6b7280;
-}
-.bg-white {
-  background-color: #fff;
-}
-.flex {
+
+.bookmanager-error {
+  background: #223a5f;
+  color: #eaf6ff;
+  border-radius: 1rem;
+  padding: 1rem 2rem;
+  margin: 1rem auto 2rem auto;
+  max-width: 500px;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px #223a5f44;
 }
-.gap-8 {
-  grid-gap: 2rem;
+
+.bookmanager-error-btn {
+  background: #47c6ff;
+  color: #181e2a;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.5rem 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.bookmanager-error-btn:hover {
+  background: #223a5f;
+  color: #eaf6ff;
+}
+
+.bookmanager-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.bookmanager-empty {
+  text-align: center;
+  color: #eaf6ff;
+  margin-top: 4rem;
+}
+
+.bookmanager-empty-btn {
+  margin-top: 2rem;
+  background: linear-gradient(90deg, #223a5f 0%, #47c6ff 100%);
+  color: #eaf6ff;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.8rem 2rem;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.bookmanager-empty-btn:hover {
+  background: linear-gradient(90deg, #181e2a 0%, #223a5f 100%);
+}
+
+.bookmanager-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
   gap: 2rem;
+  margin-top: 2rem;
 }
-.font-bold {
+
+.bookmanager-summary {
+  text-align: center;
+  color: #eaf6ff;
+  margin-top: 3rem;
+  font-size: 1.1rem;
+}
+
+.bookmanager-query {
+  color: #47c6ff;
   font-weight: 700;
 }
-.max-w-screen-md {
-  max-width: 768px;
-}
-.flex-col {
+
+/* BookCard */
+.bookcard-dark {
+  background: #181e2a;
+  border: 2px solid #223a5f;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 16px #223a5f33;
+  padding: 1.5rem;
+  display: flex;
   flex-direction: column;
+  gap: 1rem;
+  color: #eaf6ff;
+  font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
-.items-center {
+
+.bookcard-dark:hover {
+  box-shadow: 0 8px 32px #47c6ff44;
+  border-color: #47c6ff;
+}
+
+.bookcard-img-wrap {
+  width: 100%;
+  height: 180px;
+  background: #223a5f;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.bookcard-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 1rem;
+}
+
+.bookcard-img-placeholder {
+  color: #eaf6ff88;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.bookcard-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bookcard-title {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #eaf6ff;
+  margin-bottom: 0.2rem;
+}
+
+.bookcard-authors {
+  font-size: 1rem;
+  color: #47c6ff;
+  font-weight: 700;
+}
+
+.bookcard-desc {
+  font-size: 0.95rem;
+  color: #eaf6ffcc;
+  margin-bottom: 0.5rem;
+}
+
+.bookcard-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #eaf6ff99;
+}
+
+/* LoadingSpinner */
+.spinner-dark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.spinner-circle {
+  width: 2.2em;
+  height: 2.2em;
+  border: 4px solid #223a5f;
+  border-top: 4px solid #47c6ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.3em;
+}
+
+.spinner-text {
+  color: #eaf6ff;
+  font-weight: 700;
+  font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+  font-size: 1.1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg);}
+}
+
+/* SearchForm（前回答参照） */
+.searchform-blue-bg {
+  background: linear-gradient(135deg, #1a2233 0%, #223a5f 60%, #11151c 100%);
+  border-radius: 2rem;
+  box-shadow: 0 8px 32px rgba(30,60,114,0.28);
+  padding: 3rem 2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.searchform-blue-title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #eaf6ff;
+  margin-bottom: 2rem;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 8px #0008;
+  font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+}
+
+.searchform-blue-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
   align-items: center;
 }
-.justify-center {
-  justify-content: center;
+
+.searchform-blue-input {
+  flex: 2 1 300px;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  border: 2px solid #223a5f;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: #181e2a;
+  color: #eaf6ff;
+  box-shadow: 0 2px 8px #223a5f22;
+  font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
-.border-2 {
-  border-width: 2px;
+
+.searchform-blue-input:focus {
+  outline: none;
+  border-color: #47c6ff;
+  box-shadow: 0 0 0 4px #47c6ff33;
 }
-.rounded {
-  border-radius: 0.25rem;
+
+.searchform-blue-select {
+  flex: 1 1 120px;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 2px solid #223a5f;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: #181e2a;
+  color: #eaf6ff;
+  box-shadow: 0 2px 8px #223a5f22;
+  font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
 }
-.hover\:bg-gray-200:hover {
-  background-color: #e5e7eb;
+
+.searchform-blue-btn {
+  flex: 1 1 140px;
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #223a5f 0%, #47c6ff 100%);
+  color: #eaf6ff;
+  box-shadow: 0 4px 16px #223a5f44;
+  cursor: pointer;
+  font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
+
+.searchform-blue-btn:hover:not(:disabled) {
+  transform: scale(1.08);
+  box-shadow: 0 8px 24px #47c6ff66;
+  background: linear-gradient(90deg, #181e2a 0%, #223a5f 100%);
 }
+
+.searchform-blue-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.searchform-blue-spinner {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  border: 3px solid #eaf6ff;
+  border-top: 3px solid #47c6ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+
+html, body {
+  min-height: 100vh;
+  background: linear-gradient(120deg, #181e2a 0%, #223a5f 100%);
+  font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
