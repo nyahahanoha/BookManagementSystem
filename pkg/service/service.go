@@ -59,12 +59,16 @@ func (s *BooksService) Run() error {
 					s.lg.Error("failed to get info", slog.String("err", err.Error()))
 					return
 				}
-				s.lg.Info("Get Book Info",
-					slog.Any("info", info),
-				)
 				if err := s.store.Put(*info); err != nil {
 					s.lg.Error("failed to put info in store", slog.String("err", err.Error()))
 				}
+				info, err = s.store.Get(result.ISBN)
+				if err != nil {
+					s.lg.Error("failed to get info in store", slog.String("err", err.Error()))
+				}
+				s.lg.Info("Get Book Info",
+					slog.Any("info", info),
+				)
 			}(result)
 		}
 	}()
