@@ -4,13 +4,14 @@ WORKDIR /app
 
 COPY . .
 RUN go mod tidy
-RUN go build -o bookMgmtSystem main.go
+RUN GOOS=linux GOARCH=arm64 go build -o bookMgmtSystem main.go
 
 # 実行用（Alpine など軽量イメージ）
-FROM alpine:latest
+FROM ubuntu:latest
 WORKDIR /app
 
 COPY --from=builder /app/bookMgmtSystem .
+RUN chmod +x bookMgmtSystem
 
 # 実行
-CMD ["./bookMgmtSystem"]
+CMD ["/app/bookMgmtSystem"]

@@ -1,9 +1,9 @@
 ---
 version: '3.8'
 services:
-  sample:
+  booksystem_db:
     image: mysql:latest
-    container_name: mysql
+    container_name: booksystem_db
     volumes:
       - db_data:/var/lib/mysql
     restart: always
@@ -15,6 +15,30 @@ services:
       TZ: "Asia/Tokyo"
     ports:
       - "3306:3306"
+  booksystem_api:
+    build: ./backend
+    container_name: booksystem_api
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - booksystem_db
+    network_mode: host
+    privileged: true
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - /var/run/dbus:/var/run/dbus
+      - /dev/bus/usb:/dev/bus/usb
+  booksystem_ui:
+    build: ./frontend
+    container_name: booksystem_ui
+    restart: always
+    environment:
+      API_BASE_URL: http://localhost:8080
+    ports:
+      - "8000:8000"
+    depends_on:
+      - booksystem_api
 volumes:
   db_data:
     driver: local
