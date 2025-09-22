@@ -5,7 +5,7 @@ export default function BookCard({ book, onDelete }: { book: BookInfo, onDelete?
   const title = book.Title;
   const authors = book.Authors;
   const description = book.Description;
-  const imageFileName =  book.Image?.Path;
+  const imageFileName = book.Image?.Path;
   const isbn = book.ISBN;
   const publishdate = book.Publishdate;
 
@@ -38,25 +38,29 @@ export default function BookCard({ book, onDelete }: { book: BookInfo, onDelete?
   };
 
   return (
-    <div class="bookcard-dark">
-      <div class="bookcard-img-wrap">
+    <div class="bookcard-horizontal">
+      <div class="bookcard-horizontal-img">
         {imageUrl ? (
-          <img src={imageUrl} alt="" class="bookcard-img" />
+          <img src={imageUrl} alt="" class="bookcard-horizontal-img-el" />
         ) : (
           <div class="bookcard-img-placeholder">No Image</div>
         )}
       </div>
-      <div class="bookcard-content">
-        <h3 class="bookcard-title">{title}</h3>
-        <p class="bookcard-authors">{Array.isArray(authors) ? authors.join(", ") : authors}</p>
-        <p class="bookcard-desc">{description}</p>
-        <div class="bookcard-meta">
-          <span class="bookcard-isbn">ISBN: {isbn}</span>
-          <span class="bookcard-date">{yearMonth}</span>
+      <div class="bookcard-horizontal-main">
+        <div class="bookcard-horizontal-header">
+          <h3 class="bookcard-horizontal-title">{title}</h3>
+          <p class="bookcard-horizontal-authors">{Array.isArray(authors) ? authors.join(", ") : authors}</p>
         </div>
-        <button class="bookcard-delete-btn" onClick={handleDelete}>
-          Delete
-        </button>
+        <div class="bookcard-horizontal-desc">{description}</div>
+        <div class="bookcard-horizontal-footer">
+          <div class="bookcard-horizontal-meta">
+            <span class="bookcard-horizontal-isbn">ISBN: {isbn}</span>
+            <span class="bookcard-horizontal-date">{yearMonth}</span>
+          </div>
+          <button class="bookcard-delete-btn" onClick={handleDelete}>
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   );
