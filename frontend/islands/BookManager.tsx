@@ -23,8 +23,8 @@ export default function BookManager() {
     setError(null);
     try {
       const response = await BookAPI.getAllBooks();
-      if (response.Books) {
-        setBooks(response.Books);
+      if (response.books) {
+        setBooks(response.books);
       } else {
         setBooks([]);
       }
@@ -48,8 +48,7 @@ export default function BookManager() {
       } else {
         response = await BookAPI.searchBooksByTitle(query);
       }
-      
-      setSearchResults(response.Books || []);
+      setSearchResults(response.books || []);
       setCurrentView('search');
     } catch (err) {
       setError("Search failed. Please try again.");
