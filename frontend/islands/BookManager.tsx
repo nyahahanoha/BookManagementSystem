@@ -5,6 +5,8 @@ import BookCard from "../components/BookCard.tsx";
 import SearchForm from "../components/SearchForm.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
 
+const PAGE_SIZE = 30;
+
 export default function BookManager() {
   const [books, setBooks] = useState<BookInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -12,6 +14,7 @@ export default function BookManager() {
   const [searchResults, setSearchResults] = useState<BookInfo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     loadAllBooks();
@@ -25,6 +28,7 @@ export default function BookManager() {
       setBooks(response.books || []);
       setSearchResults(null);
       setSearchQuery("");
+      setPage(1);
     } catch (err) {
       setError("Failed to load books. Please check if the API server is running.");
       console.error("Error loading books:", err);
@@ -37,6 +41,7 @@ export default function BookManager() {
     setSearchLoading(true);
     setError(null);
     setSearchQuery(query);
+    setPage(1);
 
     if (query.trim() === "") {
       setSearchResults(null);
@@ -51,7 +56,6 @@ export default function BookManager() {
       } else {
         response = await BookAPI.searchBooksByTitle(query);
       }
-      console.log("Search response:", response);
       setSearchResults(response.books || []);
     } catch (err) {
       setError("Search failed. Please try again.");
@@ -61,8 +65,19 @@ export default function BookManager() {
     }
   };
 
+  const handleDelete = (isbn: string) => {
+    if (searchResults !== null) {
+      setSearchResults(searchResults.filter(book => book.ISBN !== isbn));
+    }
+    setBooks(books.filter(book => book.ISBN !== isbn));
+  };
+
   const displayBooks = searchResults === null ? books : searchResults;
   const isEmpty = !displayBooks || displayBooks.length === 0;
+
+  // ページネーション
+  const totalPages = Math.ceil(displayBooks.length / PAGE_SIZE);
+  const pagedBooks = displayBooks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div class="bookmanager-bg">
@@ -98,16 +113,35 @@ export default function BookManager() {
               </button>
             </div>
           ) : (
-            <div class="bookmanager-grid">
-              {displayBooks.map((book) => (
-                <BookCard key={book.ISBN} book={book} />
-              ))}
-            </div>
+            <>
+              <div class="bookmanager-grid">
+                {pagedBooks.map((book) => (
+                  <BookCard
+                    key={book.ISBN}
+                    book={book}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+              {totalPages > 1 && (
+                <div class="bookmanager-pagination">
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i + 1}
+                      class={`bookmanager-page-btn${page === i + 1 ? " active" : ""}`}
+                      onClick={() => setPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
           )}
           {!isEmpty && (
             <div class="bookmanager-summary">
               <span>
-                Showing <strong>{displayBooks.length}</strong> books
+                Showing <strong>{pagedBooks.length}</strong> books
                 {searchResults !== null && searchQuery.trim() !== "" && (
                   <> for "<span class="bookmanager-query">{searchQuery}</span>"</>
                 )}
