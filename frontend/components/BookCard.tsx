@@ -1,18 +1,29 @@
+import { useEffect, useState } from "preact/hooks";
 import { BookInfo } from "../types/book.ts";
 
 export default function BookCard({ book }: { book: BookInfo }) {
   const title = book.title || book.Title;
   const authors = book.authors || book.Authors;
   const description = book.description || book.Description;
-  const imagePath = book.image?.Path || book.Image?.Path;
+  const imageFileName = book.image?.Path || book.Image?.Path;
   const isbn = book.isbn || book.ISBN;
   const publishdate = book.publishdate || book.Publishdate;
+
+  const [imageUrl, setImageUrl] = useState<string>("");
+
+  useEffect(() => {
+    if (imageFileName) {
+      setImageUrl(`http://localhost:8080/images/${imageFileName}`);
+    } else {
+      setImageUrl("");
+    }
+  }, [imageFileName]);
 
   return (
     <div class="bookcard-dark">
       <div class="bookcard-img-wrap">
-        {imagePath && imagePath !== "" ? (
-          <img src={imagePath} alt="" class="bookcard-img" />
+        {imageUrl ? (
+          <img src={imageUrl} alt="" class="bookcard-img" />
         ) : (
           <div class="bookcard-img-placeholder">No Image</div>
         )}

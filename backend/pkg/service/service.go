@@ -142,7 +142,14 @@ func (s *BooksService) Listen() error {
 		return fmt.Errorf("failed to create router: %w", err)
 	}
 	api.SetApp(router)
-	s.api.Handler = api.MakeHandler()
+  s.api.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    if strings.HasPrefix(r.URL.Path, "/images/") {
+			  filePath := "/var/lib/booksystem" + r.URL.Path[len("/images"):]
+        http.ServeFile(w, r, filePath)
+        return
+    }
+    api.MakeHandler().ServeHTTP(w, r)
+  })
 	if err := s.api.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return fmt.Errorf("failed to serve: %w", err)
 	}

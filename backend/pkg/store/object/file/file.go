@@ -73,7 +73,7 @@ func (s *FileStore) Get(isbn string) (string, error) {
 
 	for _, entry := range entries {
 		if !entry.IsDir() && strings.Contains(entry.Name(), isbn) {
-			return path.Join(s.prefix, entry.Name()), nil
+			return entry.Name(), nil
 		}
 	}
 	return "", nil
