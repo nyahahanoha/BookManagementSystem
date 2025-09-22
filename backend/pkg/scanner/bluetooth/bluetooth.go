@@ -14,6 +14,8 @@ import (
 type Bluetooth struct {
 	lg *slog.Logger
 
+	Name               string
+	Timeout            time.Duration
 	ServiceUUID        string
 	CharacteristicUUID string
 
@@ -24,57 +26,62 @@ type Bluetooth struct {
 var adapter = ble.DefaultAdapter
 
 func NewBluetooth(lg *slog.Logger, config scannerconfig.BluetoothConfig) (*Bluetooth, error) {
-	if err := adapter.Enable(); err != nil {
-		return nil, fmt.Errorf("failed to create bluetooth adapater: %w", err)
-	}
-
-	ch := make(chan ble.ScanResult, 1)
-	if err := adapter.Scan(func(adapter *ble.Adapter, result ble.ScanResult) {
-		lg.Info("found device",
-			slog.String("name", result.LocalName()),
-			slog.String("address", result.Address.String()),
-		)
-		if result.LocalName() == config.Name {
-			if err := adapter.StopScan(); err != nil {
-				lg.Error("failed to stop scan")
-			}
-			ch <- result
-		}
-	}); err != nil {
-		return nil, fmt.Errorf("failed to scan bluetooth scanner: %w", err)
-	}
-
-	select {
-	case result := <-ch:
-		lg.Info("Connecting...",
-			slog.String("device", result.LocalName()),
-		)
-		device, err := adapter.Connect(result.Address, ble.ConnectionParams{})
-		lg.Info("Connected!",
-			slog.String("device", result.LocalName()),
-		)
-
-		if err != nil {
-			return nil, fmt.Errorf("failed to connect bluetooth scanner: %w", err)
-		}
-
-		return &Bluetooth{
-			lg:                 lg.With(slog.String("Package", "bluetooth")),
-			ServiceUUID:        config.ServiceUUID,
-			CharacteristicUUID: config.CharacteristicUUID,
-			device:             device,
-			closech:            make(chan struct{}),
-		}, nil
-
-	case <-time.After(config.Timeout):
-		return nil, fmt.Errorf("failed to connect bluetooth scanner: Timeout")
-	}
+	return &Bluetooth{
+		lg:                 lg.With(slog.String("Package", "bluetooth")),
+		Name:               config.Name,
+		Timeout:            config.Timeout,
+		ServiceUUID:        config.ServiceUUID,
+		CharacteristicUUID: config.CharacteristicUUID,
+		closech:            make(chan struct{}),
+	}, nil
 }
 
 func (s *Bluetooth) Close() error {
 	s.lg.Info("Close Bluetooth")
 	close(s.closech)
 	return s.device.Disconnect()
+}
+
+func (s *Bluetooth) Connect() error {
+	if err := adapter.Enable(); err != nil {
+		return fmt.Errorf("failed to create bluetooth adapater: %w", err)
+	}
+
+	ch := make(chan ble.ScanResult, 1)
+	if err := adapter.Scan(func(adapter *ble.Adapter, result ble.ScanResult) {
+		s.lg.Info("found device",
+			slog.String("name", result.LocalName()),
+			slog.String("address", result.Address.String()),
+		)
+		if result.LocalName() == s.Name {
+			if err := adapter.StopScan(); err != nil {
+				s.lg.Error("failed to stop scan")
+			}
+			ch <- result
+		}
+	}); err != nil {
+		return fmt.Errorf("failed to scan bluetooth scanner: %w", err)
+	}
+
+	select {
+	case result := <-ch:
+		s.lg.Info("Connecting...",
+			slog.String("device", result.LocalName()),
+		)
+		device, err := adapter.Connect(result.Address, ble.ConnectionParams{})
+		s.lg.Info("Connected!",
+			slog.String("device", result.LocalName()),
+		)
+
+		if err != nil {
+			return fmt.Errorf("failed to connect bluetooth scanner: %w", err)
+		}
+
+		s.device = device
+		return nil
+	case <-time.After(s.Timeout):
+		return fmt.Errorf("failed to connect bluetooth scanner: Timeout")
+	}
 }
 
 func (s *Bluetooth) Run(ch chan scannercommon.Result) error {

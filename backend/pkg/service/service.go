@@ -57,9 +57,89 @@ func NewBooksService(lg *slog.Logger, config config.Config) (*BooksService, erro
 	}, nil
 }
 
-func (s *BooksService) Run() error {
+func (s *BooksService) Listen() error {
+	api := rest.NewApi()
+	api.Use(CORSMiddleware())
+	api.Use(rest.DefaultDevStack...)
+	router, err := rest.MakeRouter(
+		rest.Get("/books", s.GetAllBooks),
+		rest.Get("/book:isbn", s.GetBook),
+		rest.Get("/books/search:title", s.SearchBook),
+		rest.Post("/scan:action", s.Scan),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create router: %w", err)
+	}
+	api.SetApp(router)
+	s.api.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/images/") {
+			filePath := "/var/lib/booksystem" + r.URL.Path[len("/images"):]
+			http.ServeFile(w, r, filePath)
+			return
+		}
+		api.MakeHandler().ServeHTTP(w, r)
+	})
+	s.lg.Info("Start Listen Service", slog.String("address", s.api.Addr))
+	if err := s.api.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		return fmt.Errorf("failed to serve: %w", err)
+	}
+
+	s.lg.Info("Close Listen Service")
+	return nil
+}
+
+func (s *BooksService) Shutdown() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := s.api.Shutdown(ctx); err != nil {
+		s.lg.Error("failed to shutdown api", slog.String("err", err.Error()))
+		return fmt.Errorf("failed to shutdown api: %w", err)
+	}
+	s.lg.Info("Shutdown BooksService")
+	return nil
+}
+
+func CORSMiddleware() rest.Middleware {
+	return rest.MiddlewareSimple(func(handler rest.HandlerFunc) rest.HandlerFunc {
+		return func(w rest.ResponseWriter, r *rest.Request) {
+			// CORS headers
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+			// Handle preflight requests
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			handler(w, r)
+		}
+	})
+}
+
+func (s *BooksService) Scan(w rest.ResponseWriter, r *rest.Request) {
+	action := strings.ReplaceAll(r.PathParam("action"), ":", "")
+	switch action {
+	case "start":
+		s.Start()
+	case "stop":
+		s.Close()
+	default:
+		rest.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
+}
+
+func (s *BooksService) Start() {
 	s.lg.Info("Running BooksService")
 	ch := make(chan scannercommon.Result)
+
+	if err := s.scanner.Connect(); err != nil {
+		s.lg.Error("failed to connect scanner", slog.String("err", err.Error()))
+		return
+	}
 
 	go func() {
 		for {
@@ -88,13 +168,14 @@ func (s *BooksService) Run() error {
 		}
 	}()
 
-	if err := s.scanner.Run(ch); err != nil {
-		return fmt.Errorf("failed to running scanner: %w", err)
-	}
-	return nil
+	go func() {
+		if err := s.scanner.Run(ch); err != nil {
+			s.lg.Error("failed to running scanner", slog.String("err", err.Error()))
+		}
+	}()
 }
 
-func (s *BooksService) Close() error {
+func (s *BooksService) Close() {
 	s.lg.Info("Close BooksService")
 	if err := s.books.Close(); err != nil {
 		s.lg.Error("Failed to close books", slog.String("err", err.Error()))
@@ -102,60 +183,6 @@ func (s *BooksService) Close() error {
 	if err := s.scanner.Close(); err != nil {
 		s.lg.Error("Failed to close scanner", slog.String("err", err.Error()))
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := s.api.Shutdown(ctx); err != nil {
-		s.lg.Info("Server closed")
-	}
-	return nil
-}
-
-func CORSMiddleware() rest.Middleware {
-	return rest.MiddlewareSimple(func(handler rest.HandlerFunc) rest.HandlerFunc {
-		return func(w rest.ResponseWriter, r *rest.Request) {
-			// CORS headers
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-			// Handle preflight requests
-			if r.Method == "OPTIONS" {
-				w.WriteHeader(http.StatusOK)
-				return
-			}
-
-			handler(w, r)
-		}
-	})
-}
-
-func (s *BooksService) Listen() error {
-	api := rest.NewApi()
-	api.Use(CORSMiddleware())
-	api.Use(rest.DefaultDevStack...)
-	router, err := rest.MakeRouter(
-		rest.Get("/books", s.GetAllBooks),
-		rest.Get("/book:isbn", s.GetBook),
-		rest.Get("/books/search:title", s.SearchBook),
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create router: %w", err)
-	}
-	api.SetApp(router)
-	s.api.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/images/") {
-			filePath := "/var/lib/booksystem" + r.URL.Path[len("/images"):]
-			http.ServeFile(w, r, filePath)
-			return
-		}
-		api.MakeHandler().ServeHTTP(w, r)
-	})
-	if err := s.api.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("failed to serve: %w", err)
-	}
-
-	s.lg.Info("Close Listen Service")
-	return nil
 }
 
 func (s *BooksService) GetBook(w rest.ResponseWriter, r *rest.Request) {

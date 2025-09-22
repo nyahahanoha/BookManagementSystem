@@ -31,12 +31,6 @@ func main() {
 	}
 
 	go func() {
-		if err := service.Run(); err != nil {
-			logger.Error("failed to service", slog.String("err", err.Error()))
-		}
-	}()
-
-	go func() {
 		if err := service.Listen(); err != nil {
 			logger.Error("failed to service", slog.String("err", err.Error()))
 		}
@@ -45,7 +39,7 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
-	if err := service.Close(); err != nil {
+	if err := service.Shutdown(); err != nil {
 		log.Fatalf("failed to close service: %v", err)
 	}
 }

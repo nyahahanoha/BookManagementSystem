@@ -10,6 +10,7 @@ import (
 )
 
 type Scanner interface {
+	Connect() error
 	Run(ch chan scannercommon.Result) error
 	Close() error
 }
