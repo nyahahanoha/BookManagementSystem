@@ -107,6 +107,50 @@
   font-weight: 700;
 }
 
+.bookmanager-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+  margin: 1.5rem 0 0.5rem 0;
+}
+
+.bookmanager-page-btn {
+  background: linear-gradient(90deg, #223a5f 0%, #47c6ff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.7rem 1.4rem;
+  font-weight: 900;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #223a5f44;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  letter-spacing: 0.04em;
+  text-align: center;
+  outline: none;
+}
+
+.bookmanager-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bookmanager-page-btn:hover:not(:disabled) {
+  background: linear-gradient(90deg, #47c6ff 0%, #223a5f 100%);
+  color: #181e2a;
+  transform: scale(1.12);
+  box-shadow: 0 4px 16px #47c6ff55;
+}
+
+.bookmanager-page-num {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #eaf6ff;
+  letter-spacing: 0.04em;
+  padding: 0 0.5rem;
+}
+
 /* BookCard */
 .bookcard-dark {
   background: #181e2a;

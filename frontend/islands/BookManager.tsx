@@ -5,7 +5,7 @@ import BookCard from "../components/BookCard.tsx";
 import SearchForm from "../components/SearchForm.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
 
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 5;
 
 export default function BookManager() {
   const [books, setBooks] = useState<BookInfo[]>([]);
@@ -125,15 +125,23 @@ export default function BookManager() {
               </div>
               {totalPages > 1 && (
                 <div class="bookmanager-pagination">
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      key={i + 1}
-                      class={`bookmanager-page-btn${page === i + 1 ? " active" : ""}`}
-                      onClick={() => setPage(i + 1)}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
+                  <button
+                    class="bookmanager-page-btn"
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    &lt; Prev
+                  </button>
+                  <span class="bookmanager-page-num">
+                    {page} / {totalPages}
+                  </span>
+                  <button
+                    class="bookmanager-page-btn"
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    Next &gt;
+                  </button>
                 </div>
               )}
             </>
