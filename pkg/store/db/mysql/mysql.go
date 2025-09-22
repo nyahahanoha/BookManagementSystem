@@ -86,6 +86,13 @@ func (s *MySQL) Put(book bookscommon.Info) error {
 		}
 	}()
 
+	var pubDate interface{}
+	if book.Publishdate.IsZero() {
+		pubDate = nil
+	} else {
+		pubDate = book.Publishdate
+	}
+
 	_, err = tx.Exec(`INSERT INTO books(
 		isbn,
 		title,
@@ -97,7 +104,7 @@ func (s *MySQL) Put(book bookscommon.Info) error {
 		book.ISBN,
 		book.Title,
 		book.Description,
-		book.Publishdate,
+		pubDate,
 		book.Language.String(),
 		book.Image.Source.String(),
 	)
