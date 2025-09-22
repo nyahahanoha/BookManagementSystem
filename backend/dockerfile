@@ -1,0 +1,16 @@
+# ビルド用
+FROM golang:1.24 AS builder
+WORKDIR /app
+
+COPY . .
+RUN go mod tidy
+RUN go build -o bookMgmtSystem main.go
+
+# 実行用（Alpine など軽量イメージ）
+FROM alpine:latest
+WORKDIR /app
+
+COPY --from=builder /app/bookMgmtSystem .
+
+# 実行
+CMD ["./bookMgmtSystem"]
