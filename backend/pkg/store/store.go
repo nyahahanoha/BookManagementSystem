@@ -90,4 +90,12 @@ func (s *BookStore) Search(title string) ([]bookscommon.Info, error) {
 	return books, nil
 }
 
-func (s *BookStore) Del(isbn string) error { return nil }
+func (s *BookStore) Del(isbn string) error {
+	if err := s.db.Delete(isbn); err != nil {
+		return fmt.Errorf("failed to delete info in db: %w", err)
+	}
+	if err := s.object.Delete(isbn); err != nil {
+		return fmt.Errorf("failed to delete image in object: %w", err)
+	}
+	return nil
+}

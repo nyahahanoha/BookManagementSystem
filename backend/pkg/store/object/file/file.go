@@ -10,6 +10,7 @@ import (
 	"path"
 	"strings"
 
+	storecommon "github.com/BookManagementSystem/pkg/store/common"
 	storeconfig "github.com/BookManagementSystem/pkg/store/config"
 )
 
@@ -77,4 +78,24 @@ func (s *FileStore) Get(isbn string) (string, error) {
 		}
 	}
 	return "", nil
+}
+
+func (s *FileStore) Delete(isbn string) error {
+	entries, err := os.ReadDir(s.prefix)
+	if err != nil {
+		return fmt.Errorf("failed to read dir: %w", err)
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() && strings.Contains(entry.Name(), isbn) {
+			path := path.Join(s.prefix, entry.Name())
+			if err := os.Remove(path); err != nil {
+				return fmt.Errorf("failed to delete file %s: %w", path, err)
+			} else {
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("failed to delete file: %w", storecommon.ErrNotFoundBook)
 }

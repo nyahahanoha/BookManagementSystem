@@ -15,6 +15,7 @@ type DBStore interface {
 	Get(isbn string) (bookscommon.Info, error)
 	GetAll() ([]bookscommon.Info, error)
 	Search(title string) ([]bookscommon.Info, error)
+	Delete(isbn string) error
 
 	Close() error
 }

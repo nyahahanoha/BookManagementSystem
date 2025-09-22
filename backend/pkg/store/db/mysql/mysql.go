@@ -50,7 +50,8 @@ func (s *MySQL) Init() error {
 		description varchar(2000),
 		publishdate date,
 		language varchar(8),
-		image varchar(200)
+		image varchar(200),
+		deleted boolean DEFAULT false
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to create table: %w", err)
@@ -60,6 +61,7 @@ func (s *MySQL) Init() error {
 		id int AUTO_INCREMENT PRIMARY KEY,
 		isbn varchar(14),
 		author varchar(200),
+		deleted boolean DEFAULT false,
 		UNIQUE KEY isbn_author (isbn, author)
 	)`)
 	if err != nil {
@@ -109,7 +111,8 @@ func (s *MySQL) Put(book bookscommon.Info) error {
     description = VALUES(description),
     publishdate = VALUES(publishdate),
     language = VALUES(language),
-    image = VALUES(image)
+    image = VALUES(image),
+		deleted = false
 	 `,
 		book.ISBN,
 		book.Title,
@@ -129,7 +132,8 @@ func (s *MySQL) Put(book bookscommon.Info) error {
 		) VALUES (?, ?)
 		ON DUPLICATE KEY UPDATE
 		  isbn = VALUES(isbn),
- 	    author = VALUES(author)
+ 	    author = VALUES(author),
+			deleted = false
 		 `,
 			book.ISBN,
 			author,
@@ -149,7 +153,7 @@ func (s *MySQL) Get(isbn string) (bookscommon.Info, error) {
         publishdate,
         language,
         image
-        FROM books WHERE isbn = ?`, isbn)
+        FROM books WHERE isbn = ? AND deleted = false`, isbn)
 	if err != nil {
 		return bookscommon.Info{}, fmt.Errorf("failed to execute query: %w", err)
 	}
@@ -170,7 +174,7 @@ func (s *MySQL) GetAll() ([]bookscommon.Info, error) {
         description,
         publishdate,
         language,
-        image FROM books`)
+        image FROM books WHERE deleted = false`)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
@@ -191,7 +195,7 @@ func (s *MySQL) Search(title string) ([]bookscommon.Info, error) {
         publishdate,
         language,
         image
-				FROM books WHERE title LIKE ?`, "%"+title+"%")
+				FROM books WHERE title LIKE ? AND deleted = false`, "%"+title+"%")
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
@@ -268,4 +272,34 @@ func (s *MySQL) rowConvertInfo(rows *sql.Rows) ([]bookscommon.Info, error) {
 		books = append(books, book)
 	}
 	return books, nil
+}
+
+func (s *MySQL) Delete(isbn string) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			if err := tx.Rollback(); err != nil {
+				s.lg.Error("failed to rollback at transaction", slog.String("err", err.Error()))
+			}
+			s.lg.Error("failed to reconver", slog.Any("p", p))
+		} else if err != nil {
+			if err := tx.Rollback(); err != nil {
+				s.lg.Error("failed to rollback at transaction", slog.String("err", err.Error()))
+			}
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
+	if err := s.db.QueryRow(`UPDATE books SET deleted = true WHERE isbn = ?`, isbn); err.Err() != nil {
+		return fmt.Errorf("failed to execute query: %w", err.Err())
+	}
+	if err := s.db.QueryRow(`UPDATE authors SET deleted = true WHERE isbn = ?`, isbn); err.Err() != nil {
+		return fmt.Errorf("failed to execute query: %w", err.Err())
+	}
+	return nil
 }

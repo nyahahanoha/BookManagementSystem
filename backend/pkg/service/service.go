@@ -66,6 +66,7 @@ func (s *BooksService) Listen() error {
 		rest.Get("/book:isbn", s.GetBook),
 		rest.Get("/books/search:title", s.SearchBook),
 		rest.Post("/scan:action", s.Scan),
+		rest.Delete("/book:isbn", s.Delete),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create router: %w", err)
@@ -156,10 +157,12 @@ func (s *BooksService) Start() {
 				}
 				if err := s.store.Put(*info); err != nil {
 					s.lg.Error("failed to put info in store", slog.String("err", err.Error()))
+					return
 				}
 				book, err := s.store.Get(result.ISBN)
 				if err != nil {
 					s.lg.Error("failed to get info in store", slog.String("err", err.Error()))
+					return
 				}
 				s.lg.Info("Get Book Info",
 					slog.Any("info", book),
@@ -253,4 +256,15 @@ func (s *BooksService) SearchBook(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (s *BooksService) Delete(w rest.ResponseWriter, r *rest.Request) {
+	isbn := strings.ReplaceAll(r.PathParam("isbn"), ":", "")
+
+	if err := s.store.Del(isbn); err != nil {
+		s.lg.Error("internal server error", slog.String("err", err.Error()))
+		rest.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
