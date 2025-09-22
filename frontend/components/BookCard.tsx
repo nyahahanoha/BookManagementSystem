@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { BookInfo } from "../types/book.ts";
+import { API_BASE_URL } from "../utils/api.ts";
 
 export default function BookCard({ book, onDelete }: { book: BookInfo, onDelete?: (isbn: string) => void }) {
   const title = book.Title;
@@ -13,7 +14,7 @@ export default function BookCard({ book, onDelete }: { book: BookInfo, onDelete?
 
   useEffect(() => {
     if (imageFileName) {
-      setImageUrl(`http://localhost:8080/images/${imageFileName}`);
+      setImageUrl(`${API_BASE_URL}/images/${imageFileName}`);
     } else {
       setImageUrl("");
     }
@@ -29,7 +30,7 @@ export default function BookCard({ book, onDelete }: { book: BookInfo, onDelete?
 
   const handleDelete = async () => {
     if (!isbn) return;
-    const res = await fetch(`http://localhost:8080/book:${isbn}`, {
+    const res = await fetch(`${API_BASE_URL}/book:${isbn}`, {
       method: "DELETE",
     });
     if (res.ok && onDelete) {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "preact/hooks";
+import { API_BASE_URL } from "../utils/api.ts";
 
 interface SearchFormProps {
   onSearch: (query: string, type: 'isbn' | 'title') => void;
@@ -32,7 +33,7 @@ export default function SearchForm({ onSearch, loading }: SearchFormProps) {
     setScanLoading(true);
     try {
       const endpoint = scanning ? "scan:stop" : "scan:start";
-      await fetch(`http://localhost:8080/${endpoint}`, { method: "POST" });
+      await fetch(`${API_BASE_URL}/${endpoint}`, { method: "POST" });
       setScanning(!scanning);
     } catch (err) {
       // エラー処理は必要に応じて

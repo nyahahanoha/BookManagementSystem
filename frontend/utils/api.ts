@@ -1,7 +1,7 @@
 // utils/api.ts
 import { BookInfo, BooksResponse } from "../types/book.ts";
 
-const API_BASE_URL = "http://localhost:8080";
+export const API_BASE_URL = "http://localhost:8080";
 
 export class BookAPI {
   static async getAllBooks(): Promise<BooksResponse> {
@@ -13,7 +13,7 @@ export class BookAPI {
       return await response.json();
     } catch (error) {
       console.error("Error fetching all books:", error);
-      return { Books: null, Count: 0 };
+      return { books: null, count: 0 };
     }
   }
 
@@ -26,7 +26,7 @@ export class BookAPI {
       return await response.json();
     } catch (error) {
       console.error("Error fetching book by ISBN:", error);
-      return { Books: null, Count: 0 };
+      return { books: null, count: 0 };
     }
   }
 
@@ -40,7 +40,7 @@ export class BookAPI {
       return await response.json();
     } catch (error) {
       console.error("Error searching books:", error);
-      return { Books: null, Count: 0 };
+      return { books: null, count: 0 };
     }
   }
 }
