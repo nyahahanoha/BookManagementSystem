@@ -1,0 +1,57 @@
+package filestore
+
+import (
+	"fmt"
+	"io"
+	"log/slog"
+	"net/http"
+	"net/url"
+	"os"
+	"path"
+
+	storeconfig "github.com/BookManagementSystem/pkg/store/config"
+)
+
+type FileStore struct {
+	lg     *slog.Logger
+	prefix string
+}
+
+func NewFileStore(lg *slog.Logger, config storeconfig.FileConfig) (*FileStore, error) {
+	return &FileStore{
+		prefix: config.Prefix,
+		lg:     lg.With(slog.String("Package", "filesystem")),
+	}, nil
+}
+
+func (s *FileStore) Put(url url.URL, isbn string) error {
+	resp, err := http.Get(url.String())
+	if err != nil {
+		return fmt.Errorf("failed to download image: %w", err)
+	}
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			s.lg.Error("failed to close responce")
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	path := path.Join(s.prefix, isbn)
+	out, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+
+	return nil
+}
+
+func (s *FileStore) Get(isbn string) (string, error) {
+	return path.Join(s.prefix, isbn), nil
+}
