@@ -8,12 +8,14 @@ import (
 	"github.com/BookManagementSystem/pkg/config"
 	"github.com/BookManagementSystem/pkg/scanner"
 	scannercommon "github.com/BookManagementSystem/pkg/scanner/common"
+	"github.com/BookManagementSystem/pkg/store"
 )
 
 type BooksService struct {
 	lg      *slog.Logger
 	books   books.Books
 	scanner scanner.Scanner
+	store   store.BookStore
 }
 
 func NewBooksService(lg *slog.Logger, config config.Config) (*BooksService, error) {
@@ -27,9 +29,15 @@ func NewBooksService(lg *slog.Logger, config config.Config) (*BooksService, erro
 		return nil, fmt.Errorf("faild to create scanner: %w", err)
 	}
 
+	store, err := store.NewBooksStore(lg, config.StoreConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create store: %w", err)
+	}
+
 	return &BooksService{
 		books:   books,
 		scanner: scanner,
+		store:   *store,
 		lg:      lg.With(slog.String("Package", "service")),
 	}, nil
 }
@@ -53,6 +61,9 @@ func (s *BooksService) Run() error {
 				s.lg.Info("Get Book Info",
 					slog.Any("info", info),
 				)
+				if err := s.store.Put(*info); err != nil {
+					s.lg.Error("failed to put info in store", slog.String("err", err.Error()))
+				}
 			}(result)
 		}
 	}()

@@ -18,7 +18,7 @@ type MySQL struct {
 }
 
 func NewMySQL(lg *slog.Logger, config storeconfig.MySQLConfig) (*MySQL, error) {
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@(%s:%d)/%s?parseTime=true",
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4&parseTime=true",
 		config.User,
 		config.Password,
 		config.IPAddress,
@@ -44,11 +44,11 @@ func (s *MySQL) Close() error {
 func (s *MySQL) Init() error {
 	_, err := s.db.Exec(`CREATE TABLE IF NOT EXISTS books(
 		isbn varchar(14) PRIMARY KEY, 
-		title varcher(200), 
-		description varcher(200),
+		title varchar(200), 
+		description varchar(2000),
 		publishdate date,
-		language varcher(8)
-		image varcher(200)
+		language varchar(8),
+		image varchar(200)
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to create table: %w", err)
@@ -56,8 +56,8 @@ func (s *MySQL) Init() error {
 
 	_, err = s.db.Exec(`CREATE TABLE IF NOT EXISTS authors(
 		id int AUTO_INCREMENT PRIMARY KEY,
-		isbn varcher(14),
-		author varcher(200),
+		isbn varchar(14),
+		author varchar(200)
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to create table: %w", err)
@@ -92,7 +92,7 @@ func (s *MySQL) Put(book bookscommon.Info) error {
 		description,
 		publishdate,
 		language,
-		image,
+		image
 	) VALUES (?, ?, ?, ?, ?, ?)`,
 		book.ISBN,
 		book.Title,
@@ -108,8 +108,8 @@ func (s *MySQL) Put(book bookscommon.Info) error {
 	for _, author := range book.Authors {
 		_, err = tx.Exec(`INSERT INTO authors(
 			isbn,
-			author,
-		) VALUES (?, ?, ?, ?, ?, ?)`,
+			author
+		) VALUES (?, ?)`,
 			book.ISBN,
 			author,
 		)
