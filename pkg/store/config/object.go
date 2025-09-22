@@ -5,6 +5,7 @@ type ObjectConfig struct {
 	FileConfig FileConfig      `yaml:"file"`
 }
 
+//go:generate go run github.com/dmarkham/enumer -type=ObjectComponent -yaml
 type ObjectComponent uint32
 
 const (

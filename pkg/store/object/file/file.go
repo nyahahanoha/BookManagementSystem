@@ -39,7 +39,19 @@ func (s *FileStore) Put(url url.URL, isbn string) error {
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}
 
-	path := path.Join(s.prefix, isbn)
+	ct := resp.Header.Get("Content-Type")
+	var ext string
+	switch ct {
+	case "image/jpeg":
+		ext = ".jpeg"
+	case "image/png":
+		ext = ".png"
+	case "image/webp":
+		ext = ".webp"
+	default:
+		ext = ""
+	}
+	path := path.Join(s.prefix, isbn) + ext
 	out, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("failed to create file: %w", err)
