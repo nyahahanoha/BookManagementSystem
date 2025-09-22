@@ -48,6 +48,8 @@ func (s *FileStore) Put(url url.URL, isbn string) error {
 		ext = ".jpeg"
 	case "image/png":
 		ext = ".png"
+	case "image/gif":
+		ext = ".gif"
 	case "image/webp":
 		ext = ".webp"
 	default:

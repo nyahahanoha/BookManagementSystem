@@ -42,13 +42,22 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 		return nil, fmt.Errorf("failed to request: %w", err)
 	}
 	if volumes.TotalItems > 0 {
-		volume := volumes.Items[0]
+		volume := volumes.Items[len(volumes.Items)-1]
+
+		var desc string
+		if volume.VolumeInfo.Description != "" {
+			desc = volume.VolumeInfo.Description
+		} else if volume.SearchInfo != nil {
+			desc = volume.SearchInfo.TextSnippet
+		} else {
+			desc = "No description"
+		}
 
 		book := &bookscommon.Info{
 			ISBN:        isbn,
 			Title:       volume.VolumeInfo.Title,
 			Authors:     volume.VolumeInfo.Authors,
-			Description: volume.VolumeInfo.Description,
+			Description: desc,
 			Language:    StringToLanguage(volume.VolumeInfo.Language),
 		}
 
@@ -57,9 +66,14 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 			book.Publishdate = date
 		}
 
-		url, err := url.Parse(volume.VolumeInfo.ImageLinks.Thumbnail)
+		var u *url.URL
+		if volume.VolumeInfo.ImageLinks == nil {
+			u, err = url.Parse("https://books.google.com/googlebooks/images/no_cover_thumb.gif")
+		} else {
+			u, err = url.Parse(volume.VolumeInfo.ImageLinks.Thumbnail)
+		}
 		if err == nil {
-			book.Image.Source = *url
+			book.Image.Source = *u
 		}
 
 		return book, nil
