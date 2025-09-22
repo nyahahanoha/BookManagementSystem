@@ -9,6 +9,7 @@ import (
 	"time"
 
 	bookscommon "github.com/BookManagementSystem/pkg/books/common"
+	storecommon "github.com/BookManagementSystem/pkg/store/common"
 	storeconfig "github.com/BookManagementSystem/pkg/store/config"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -140,8 +141,8 @@ func (s *MySQL) Put(book bookscommon.Info) error {
 	return nil
 }
 
-func (s *MySQL) Get(isbn string) (*bookscommon.Info, error) {
-	row := s.db.QueryRow(`SELECT 
+func (s *MySQL) Get(isbn string) (bookscommon.Info, error) {
+	row, err := s.db.Query(`SELECT 
         isbn,
         title,
         description,
@@ -149,64 +150,122 @@ func (s *MySQL) Get(isbn string) (*bookscommon.Info, error) {
         language,
         image
         FROM books WHERE isbn = ?`, isbn)
-
-	var book bookscommon.Info
-	var langStr, imgStr string
-	var pubDate sql.NullTime
-	err := row.Scan(
-		&book.ISBN,
-		&book.Title,
-		&book.Description,
-		&pubDate,
-		&langStr,
-		&imgStr,
-	)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
-		}
-		return nil, fmt.Errorf("failed to scan book row: %w", err)
+		return bookscommon.Info{}, fmt.Errorf("failed to execute query: %w", err)
 	}
-
-	if pubDate.Valid {
-		book.Publishdate = pubDate.Time
-	} else {
-		book.Publishdate = time.Time{}
-	}
-
-	book.Language, err = bookscommon.LanguageString(langStr)
+	books, err := s.rowConvertInfo(row)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get language: %w", err)
+		return bookscommon.Info{}, fmt.Errorf("failed to convert info: %w", err)
 	}
-	imgurl, err := url.Parse(imgStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get image url: %w", err)
+	if len(books) > 0 {
+		return books[0], nil
 	}
-	book.Image.Source = *imgurl
+	return bookscommon.Info{}, storecommon.ErrNotFoundBook
+}
 
-	rows, err := s.db.Query(`SELECT author FROM authors WHERE isbn = ?`, isbn)
+func (s *MySQL) GetAll() ([]bookscommon.Info, error) {
+	rows, err := s.db.Query(`SELECT 
+        isbn,
+        title,
+        description,
+        publishdate,
+        language,
+        image FROM books`)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query authors: %w", err)
+		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
-	defer func() {
-		if err != rows.Close() {
-			s.lg.Error("failed to close query result", slog.String("err", err.Error()))
-		}
-	}()
 
-	var authors []string
+	books, err := s.rowConvertInfo(rows)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert info: %w", err)
+	}
+
+	return books, nil
+}
+
+func (s *MySQL) Search(title string) ([]bookscommon.Info, error) {
+	rows, err := s.db.Query(`SELECT 
+        isbn,
+        title,
+        description,
+        publishdate,
+        language,
+        image
+				FROM books WHERE title LIKE ?`, "%"+title+"%")
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+
+	books, err := s.rowConvertInfo(rows)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert info: %w", err)
+	}
+
+	return books, nil
+}
+
+func (s *MySQL) rowConvertInfo(rows *sql.Rows) ([]bookscommon.Info, error) {
+	var books []bookscommon.Info
 	for rows.Next() {
-		var author string
-		if err := rows.Scan(&author); err != nil {
-			return nil, fmt.Errorf("failed to scan author row: %w", err)
+		var book bookscommon.Info
+		var langStr, imgStr string
+		var pubDate sql.NullTime
+		err := rows.Scan(
+			&book.ISBN,
+			&book.Title,
+			&book.Description,
+			&pubDate,
+			&langStr,
+			&imgStr,
+		)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, nil
+			}
+			return nil, fmt.Errorf("failed to scan book row: %w", err)
 		}
-		authors = append(authors, author)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("authors rows iteration error: %w", err)
-	}
 
-	book.Authors = authors
+		if pubDate.Valid {
+			book.Publishdate = pubDate.Time
+		} else {
+			book.Publishdate = time.Time{}
+		}
 
-	return &book, nil
+		book.Language, err = bookscommon.LanguageString(langStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get language: %w", err)
+		}
+		imgurl, err := url.Parse(imgStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get image url: %w", err)
+		}
+		book.Image.Source = *imgurl
+
+		rows, err := s.db.Query(`SELECT author FROM authors WHERE isbn = ?`, book.ISBN)
+		if err != nil {
+			return nil, fmt.Errorf("failed to query authors: %w", err)
+		}
+		defer func() {
+			if err != rows.Close() {
+				s.lg.Error("failed to close query result", slog.String("err", err.Error()))
+			}
+		}()
+
+		var authors []string
+		for rows.Next() {
+			var author string
+			if err := rows.Scan(&author); err != nil {
+				return nil, fmt.Errorf("failed to scan author row: %w", err)
+			}
+			authors = append(authors, author)
+		}
+		if err := rows.Err(); err != nil {
+			return nil, fmt.Errorf("authors rows iteration error: %w", err)
+		}
+
+		book.Authors = authors
+
+		books = append(books, book)
+	}
+	return books, nil
 }

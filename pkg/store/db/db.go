@@ -12,7 +12,9 @@ import (
 type DBStore interface {
 	Init() error
 	Put(book bookscommon.Info) error
-	Get(isbn string) (*bookscommon.Info, error)
+	Get(isbn string) (bookscommon.Info, error)
+	GetAll() ([]bookscommon.Info, error)
+	Search(title string) ([]bookscommon.Info, error)
 
 	Close() error
 }
