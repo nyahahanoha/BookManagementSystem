@@ -19,6 +19,14 @@ export default function BookCard({ book }: { book: BookInfo }) {
     }
   }, [imageFileName]);
 
+  let yearMonth = "";
+  if (publishdate) {
+    const [year, month] = publishdate.split("-"); // "YYYY-MM-DD"
+    if (year && month) {
+      yearMonth = `${year}-${month}`;
+    }
+  }
+
   return (
     <div class="bookcard-dark">
       <div class="bookcard-img-wrap">
@@ -34,7 +42,7 @@ export default function BookCard({ book }: { book: BookInfo }) {
         <p class="bookcard-desc">{description}</p>
         <div class="bookcard-meta">
           <span class="bookcard-isbn">ISBN: {isbn}</span>
-          <span class="bookcard-date">{publishdate?.slice(0, 10)}</span>
+          <span class="bookcard-date">{yearMonth}</span>
         </div>
       </div>
     </div>
