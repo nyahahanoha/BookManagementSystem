@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	bookscommon "github.com/BookManagementSystem/pkg/books/common"
+	storecommon "github.com/BookManagementSystem/pkg/store/common"
 	storeconfig "github.com/BookManagementSystem/pkg/store/config"
 	"github.com/BookManagementSystem/pkg/store/db"
 	"github.com/BookManagementSystem/pkg/store/object"
@@ -44,16 +45,49 @@ func (s *BookStore) Put(book bookscommon.Info) error {
 	}
 	return nil
 }
-func (s *BookStore) Get(isbn string) (*bookscommon.Info, error) {
+func (s *BookStore) Get(isbn string) (bookscommon.Info, error) {
 	info, err := s.db.Get(isbn)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get info in db: %w", err)
+	if err == storecommon.ErrNotFoundBook {
+		return bookscommon.Info{}, err
+	} else if err != nil {
+		return bookscommon.Info{}, fmt.Errorf("failed to get info in db: %w", err)
 	}
 	path, err := s.object.Get(isbn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get image in object: %w", err)
+		return bookscommon.Info{}, fmt.Errorf("failed to get image in object: %w", err)
 	}
 	info.Image.Path = path
-	return info, err
+	return info, nil
 }
+
+func (s *BookStore) GetAll() ([]bookscommon.Info, error) {
+	books, err := s.db.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get info in db: %w", err)
+	}
+	for i, book := range books {
+		path, err := s.object.Get(book.ISBN)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get image in object: %w", err)
+		}
+		books[i].Image.Path = path
+	}
+	return books, nil
+}
+
+func (s *BookStore) Search(title string) ([]bookscommon.Info, error) {
+	books, err := s.db.Search(title)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get info in db: %w", err)
+	}
+	for i, book := range books {
+		path, err := s.object.Get(book.ISBN)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get image in object: %w", err)
+		}
+		books[i].Image.Path = path
+	}
+	return books, nil
+}
+
 func (s *BookStore) Del(isbn string) error { return nil }
