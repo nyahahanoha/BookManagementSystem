@@ -1,5 +1,4 @@
-// components/SearchForm.tsx
-import { JSX } from "preact";
+import { useState, useEffect } from "preact/hooks";
 
 interface SearchFormProps {
   onSearch: (query: string, type: 'isbn' | 'title') => void;
@@ -7,6 +6,20 @@ interface SearchFormProps {
 }
 
 export default function SearchForm({ onSearch, loading }: SearchFormProps) {
+  const [scanning, setScanning] = useState(false);
+  const [scanLoading, setScanLoading] = useState(false);
+
+  // 初期化時にlocalStorageから状態復元
+  useEffect(() => {
+    const saved = localStorage.getItem("scan-active");
+    if (saved === "true") setScanning(true);
+  }, []);
+
+  // 状態変更時にlocalStorageへ保存
+  useEffect(() => {
+    localStorage.setItem("scan-active", scanning ? "true" : "false");
+  }, [scanning]);
+
   const handleSubmit = (e: JSX.TargetedEvent<HTMLFormElement, Event>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -15,11 +28,36 @@ export default function SearchForm({ onSearch, loading }: SearchFormProps) {
     onSearch(query.trim(), searchType);
   };
 
+  const handleScanToggle = async () => {
+    setScanLoading(true);
+    try {
+      const endpoint = scanning ? "scan:stop" : "scan:start";
+      await fetch(`http://localhost:8080/${endpoint}`, { method: "POST" });
+      setScanning(!scanning);
+    } catch (err) {
+      // エラー処理は必要に応じて
+    } finally {
+      setScanLoading(false);
+    }
+  };
+
   return (
     <div class="searchform-blue-bg">
-      <h2 class="searchform-blue-title">
-        Book Search
-      </h2>
+      <div class="searchform-header-row">
+        <h2 class="searchform-blue-title">Book Search</h2>
+        <button
+          type="button"
+          class={`scan-btn${scanning ? " scan-btn-active" : ""}`}
+          onClick={handleScanToggle}
+          disabled={scanLoading}
+        >
+          {scanLoading
+            ? "Loading..."
+            : scanning
+              ? "Stop Scan"
+              : "Start Scan"}
+        </button>
+      </div>
       <form onSubmit={handleSubmit} class="searchform-blue-form">
         <input
           type="text"

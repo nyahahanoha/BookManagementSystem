@@ -338,6 +338,39 @@
   color: #fff;
 }
 
+.searchform-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.scan-btn {
+  background: linear-gradient(90deg, #1565c0 0%, #47c6ff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.7rem 1.6rem;
+  font-weight: 900;
+  font-size: 1.05rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #1565c044;
+  transition: background 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.03em;
+  text-align: center;
+  margin-left: 1rem;
+}
+
+.scan-btn-active {
+  background: linear-gradient(90deg, #e53935 0%, #b71c1c 100%);
+  box-shadow: 0 4px 16px #e5393555;
+}
+
+.scan-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 html, body {
   min-height: 100vh;
   background: linear-gradient(120deg, #181e2a 0%, #223a5f 100%);
