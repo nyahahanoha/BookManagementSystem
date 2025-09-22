@@ -57,6 +57,7 @@ func (s *BooksService) Run() error {
 				info, err := s.books.GetInfo(result.ISBN)
 				if err != nil {
 					s.lg.Error("failed to get info", slog.String("err", err.Error()))
+					return
 				}
 				s.lg.Info("Get Book Info",
 					slog.Any("info", info),
