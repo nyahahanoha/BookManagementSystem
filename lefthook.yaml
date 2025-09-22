@@ -24,16 +24,20 @@ pre-commit:
   files: git diff --name-only --cached
   jobs:
     - name: gofmt
+      root: "backend"
       glob: "*.go"
       run: go fmt ./...
     - name: govet
       glob: "*.go"
+      root: "backend"
       run: go vet ./...
     - name: goimports
       glob: "*.go"
+      root: "backend"
       run: goimports -l {files}
     - name: golangci-lint
       glob: "*.go"
+      root: "backend"
       run: |
         for dir in \
           $(git diff --cached --name-only --diff-filter=ACM \
