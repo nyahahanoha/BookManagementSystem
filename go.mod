@@ -3,6 +3,7 @@ module github.com/BookManagementSystem
 go 1.24.4
 
 require (
+	github.com/ant0ine/go-json-rest v3.3.2+incompatible
 	github.com/dlclark/regexp2 v1.11.5
 	github.com/go-sql-driver/mysql v1.9.3
 	google.golang.org/api v0.249.0

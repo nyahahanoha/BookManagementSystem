@@ -10,4 +10,6 @@ type Config struct {
 	BooksConfig   booksconfig.Config   `yaml:"books"`
 	StoreConfig   storeconfig.Config   `yaml:"store"`
 	ScannerConfig scannerconfig.Config `yaml:"scanner"`
+
+	Address string `yaml:"address"`
 }

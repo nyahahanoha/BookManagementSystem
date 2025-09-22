@@ -36,6 +36,12 @@ func main() {
 		}
 	}()
 
+	go func() {
+		if err := service.Listen(); err != nil {
+			logger.Error("failed to service", slog.String("err", err.Error()))
+		}
+	}()
+
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
