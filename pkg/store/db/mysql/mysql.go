@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"time"
 
 	bookscommon "github.com/BookManagementSystem/pkg/books/common"
 	storeconfig "github.com/BookManagementSystem/pkg/store/config"
@@ -57,7 +58,8 @@ func (s *MySQL) Init() error {
 	_, err = s.db.Exec(`CREATE TABLE IF NOT EXISTS authors(
 		id int AUTO_INCREMENT PRIMARY KEY,
 		isbn varchar(14),
-		author varchar(200)
+		author varchar(200),
+		UNIQUE KEY isbn_author (isbn, author)
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to create table: %w", err)
@@ -100,7 +102,14 @@ func (s *MySQL) Put(book bookscommon.Info) error {
 		publishdate,
 		language,
 		image
-	) VALUES (?, ?, ?, ?, ?, ?)`,
+	) VALUES (?, ?, ?, ?, ?, ?)
+	 ON DUPLICATE KEY UPDATE
+	  title = VALUES(title),
+    description = VALUES(description),
+    publishdate = VALUES(publishdate),
+    language = VALUES(language),
+    image = VALUES(image)
+	 `,
 		book.ISBN,
 		book.Title,
 		book.Description,
@@ -116,7 +125,11 @@ func (s *MySQL) Put(book bookscommon.Info) error {
 		_, err = tx.Exec(`INSERT INTO authors(
 			isbn,
 			author
-		) VALUES (?, ?)`,
+		) VALUES (?, ?)
+		ON DUPLICATE KEY UPDATE
+		  isbn = VALUES(isbn),
+ 	    author = VALUES(author)
+		 `,
 			book.ISBN,
 			author,
 		)
@@ -139,11 +152,12 @@ func (s *MySQL) Get(isbn string) (*bookscommon.Info, error) {
 
 	var book bookscommon.Info
 	var langStr, imgStr string
+	var pubDate sql.NullTime
 	err := row.Scan(
 		&book.ISBN,
 		&book.Title,
 		&book.Description,
-		&book.Publishdate,
+		&pubDate,
 		&langStr,
 		&imgStr,
 	)
@@ -152,6 +166,12 @@ func (s *MySQL) Get(isbn string) (*bookscommon.Info, error) {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("failed to scan book row: %w", err)
+	}
+
+	if pubDate.Valid {
+		book.Publishdate = pubDate.Time
+	} else {
+		book.Publishdate = time.Time{}
 	}
 
 	book.Language, err = bookscommon.LanguageString(langStr)
