@@ -110,8 +110,28 @@ func (s *BooksService) Close() error {
 	return nil
 }
 
+func CORSMiddleware() rest.Middleware {
+	return rest.MiddlewareSimple(func(handler rest.HandlerFunc) rest.HandlerFunc {
+		return func(w rest.ResponseWriter, r *rest.Request) {
+			// CORS headers
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+			// Handle preflight requests
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			handler(w, r)
+		}
+	})
+}
+
 func (s *BooksService) Listen() error {
 	api := rest.NewApi()
+	api.Use(CORSMiddleware())
 	api.Use(rest.DefaultDevStack...)
 	router, err := rest.MakeRouter(
 		rest.Get("/books", s.GetAllBooks),
@@ -136,20 +156,28 @@ func (s *BooksService) GetBook(w rest.ResponseWriter, r *rest.Request) {
 
 	info, err := s.store.Get(isbn)
 	if err == storecommon.ErrNotFoundBook {
-		w.WriteJson(servicecommon.BooksResponse{
+		if err := w.WriteJson(servicecommon.BooksResponse{
 			Books: nil,
 			Count: 0,
-		})
+		}); err != nil {
+			s.lg.Error("internal server error", slog.String("err", err.Error()))
+			rest.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 		return
 	} else if err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
 		rest.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	w.WriteJson(servicecommon.BooksResponse{
+	if err := w.WriteJson(servicecommon.BooksResponse{
 		Books: []bookscommon.Info{info},
 		Count: 1,
-	})
+	}); err != nil {
+		s.lg.Error("internal server error", slog.String("err", err.Error()))
+		rest.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *BooksService) GetAllBooks(w rest.ResponseWriter, r *rest.Request) {
@@ -159,10 +187,14 @@ func (s *BooksService) GetAllBooks(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	w.WriteJson(servicecommon.BooksResponse{
+	if err := w.WriteJson(servicecommon.BooksResponse{
 		Books: books,
 		Count: len(books),
-	})
+	}); err != nil {
+		s.lg.Error("internal server error", slog.String("err", err.Error()))
+		rest.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *BooksService) SearchBook(w rest.ResponseWriter, r *rest.Request) {
@@ -179,8 +211,12 @@ func (s *BooksService) SearchBook(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	w.WriteJson(servicecommon.BooksResponse{
+	if err := w.WriteJson(servicecommon.BooksResponse{
 		Books: books,
 		Count: len(books),
-	})
+	}); err != nil {
+		s.lg.Error("internal server error", slog.String("err", err.Error()))
+		rest.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }

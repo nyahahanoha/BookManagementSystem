@@ -42,6 +42,7 @@ pre-commit:
         for dir in \
           $(git diff --cached --name-only --diff-filter=ACM \
             | grep '\.go$' \
+            | sed 's|^backend/||' \
             | xargs -n1 dirname \
             | sort -u \
           ) \
