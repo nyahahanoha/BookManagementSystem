@@ -1,5 +1,5 @@
-import { useState } from "preact/hooks";
 import { BookInfo } from "../types/book.ts";
+import { useState, useEffect } from "preact/hooks";
 
 export default function BookCard({
   book,
@@ -18,6 +18,15 @@ export default function BookCard({
   const publishdate = book.Publishdate;
 
   const [imageUrl, setImageUrl] = useState<string>(imageFileName || "");
+
+  useEffect(() => {
+  if (imageFileName) {
+    setImageUrl(`/api/images?filename=${encodeURIComponent(imageFileName)}`);
+  } else {
+    setImageUrl("");
+  }
+}, [imageFileName]);
+
 
   let yearMonth = "";
   if (publishdate) {
