@@ -45,7 +45,9 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 	if len(volumes.Items) == 0 {
 		return nil, fmt.Errorf("not found book")
 	}
+
 	volume := volumes.Items[0]
+	var otherTitle []string
 	for _, item := range volumes.Items {
 		volumeFullTitle := volume.VolumeInfo.Title + " " + volume.VolumeInfo.Subtitle
 		itemFullTitle := item.VolumeInfo.Title + " " + item.VolumeInfo.Subtitle
@@ -75,6 +77,12 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 			volume = item
 			continue
 		}
+		otherTitle = append(otherTitle, itemFullTitle)
+	}
+
+	title := volume.VolumeInfo.Title + " " + volume.VolumeInfo.Subtitle
+	if len(otherTitle) > 0 {
+		title = fmt.Sprintf("%s / %s", title, strings.Join(otherTitle, " / "))
 	}
 
 	var desc string
@@ -88,7 +96,7 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 
 	book := &bookscommon.Info{
 		ISBN:        isbn,
-		Title:       volume.VolumeInfo.Title + " " + volume.VolumeInfo.Subtitle,
+		Title:       title,
 		Authors:     volume.VolumeInfo.Authors,
 		Description: desc,
 		Language:    StringToLanguage(volume.VolumeInfo.Language),
