@@ -117,6 +117,9 @@ func StringToDate(s string) (time.Time, error) {
 	if s == "" {
 		return date, fmt.Errorf("date is empty")
 	}
+	if len(s) == 4 {
+		s = s + "-01"
+	}
 	shortForm := "2006-01"
 	date, err := time.Parse(shortForm, s)
 	if err != nil {
