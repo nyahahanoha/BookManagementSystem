@@ -73,11 +73,13 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 			volume = item
 			continue
 		}
+
+		otherTitle = append(otherTitle, itemFullTitle)
+
 		if itemDate.After(volumeDate) {
 			volume = item
 			continue
 		}
-		otherTitle = append(otherTitle, itemFullTitle)
 	}
 
 	title := volume.VolumeInfo.Title + " " + volume.VolumeInfo.Subtitle
