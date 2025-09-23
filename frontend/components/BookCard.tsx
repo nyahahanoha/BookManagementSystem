@@ -1,4 +1,4 @@
-import { BookInfo } from "../types/book.ts";
+import { BookInfo, LanguageMap } from "../types/book.ts";
 import { useState, useEffect } from "preact/hooks";
 
 export default function BookCard({
@@ -16,6 +16,7 @@ export default function BookCard({
   const imageFileName = book.Image?.Path;
   const isbn = book.ISBN;
   const publishdate = book.Publishdate;
+  const language = LanguageMap[book.Language] || "Unknown";
 
   const [imageUrl, setImageUrl] = useState<string>(imageFileName || "");
 
@@ -65,6 +66,7 @@ export default function BookCard({
           <div class="bookcard-horizontal-meta">
             <span class="bookcard-horizontal-isbn">ISBN: {isbn}</span>
             <span class="bookcard-horizontal-date">{yearMonth}</span>
+            <span class="bookcard-horizontal-date">{language}</span>
           </div>
           <button class="bookcard-delete-btn" onClick={handleDelete}>
             Delete
