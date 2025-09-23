@@ -4,8 +4,6 @@ services:
   booksystem_db:
     image: mysql:latest
     container_name: booksystem_db
-    volumes:
-      - /var/lib/booksystem/db:/var/lib/mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -33,7 +31,10 @@ services:
     environment:
       API_BASE_URL: http://booksystem_api:8080
       TOKEN: ${TOKEN}
+    volumes:
+      - ./frontend/cert.key:/app/cert.key
+      - ./frontend/cert.pem:/app/cert.pem
     ports:
-      - "8000:8000"
+      - "443:8000"
     depends_on:
       - booksystem_api
