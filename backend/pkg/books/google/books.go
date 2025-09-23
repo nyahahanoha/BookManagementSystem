@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 
 	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
@@ -41,46 +42,74 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to request: %w", err)
 	}
-	if volumes.TotalItems > 0 {
-		volume := volumes.Items[len(volumes.Items)-1]
-
-		var desc string
-		if volume.VolumeInfo.Description != "" {
-			desc = volume.VolumeInfo.Description
-		} else if volume.SearchInfo != nil {
-			desc = volume.SearchInfo.TextSnippet
-		} else {
-			desc = "No description"
-		}
-
-		book := &bookscommon.Info{
-			ISBN:        isbn,
-			Title:       volume.VolumeInfo.Title,
-			Authors:     volume.VolumeInfo.Authors,
-			Description: desc,
-			Language:    StringToLanguage(volume.VolumeInfo.Language),
-		}
-
-		date, err := StringToDate(volume.VolumeInfo.PublishedDate)
-		if err == nil {
-			book.Publishdate = date
-		}
-
-		var u *url.URL
-		if volume.VolumeInfo.ImageLinks == nil {
-			u, err = url.Parse("https://books.google.com/googlebooks/images/no_cover_thumb.gif")
-		} else {
-			u, err = url.Parse(volume.VolumeInfo.ImageLinks.Thumbnail)
-		}
-		if err == nil {
-			book.Image.Source = *u
-		}
-
-		return book, nil
-
-	} else {
-		return nil, fmt.Errorf("failed to request: invalid isbn")
+	if len(volumes.Items) == 0 {
+		return nil, fmt.Errorf("not found book")
 	}
+	volume := volumes.Items[0]
+	for _, item := range volumes.Items {
+		volumeFullTitle := volume.VolumeInfo.Title + " " + volume.VolumeInfo.Subtitle
+		itemFullTitle := item.VolumeInfo.Title + " " + item.VolumeInfo.Subtitle
+
+		if strings.Contains(volumeFullTitle, itemFullTitle) || strings.Contains(volumeFullTitle, itemFullTitle) {
+			if len(itemFullTitle) > len(volumeFullTitle) {
+				volume = item
+			}
+			continue
+		}
+
+		if len(itemFullTitle) > len(volumeFullTitle) {
+			volume = item
+			continue
+		}
+
+		itemDate, err := StringToDate(item.VolumeInfo.PublishedDate)
+		if err != nil {
+			continue
+		}
+		volumeDate, err := StringToDate(volume.VolumeInfo.PublishedDate)
+		if err != nil {
+			volume = item
+			continue
+		}
+		if itemDate.After(volumeDate) {
+			volume = item
+			continue
+		}
+	}
+
+	var desc string
+	if volume.VolumeInfo.Description != "" {
+		desc = volume.VolumeInfo.Description
+	} else if volume.SearchInfo != nil {
+		desc = volume.SearchInfo.TextSnippet
+	} else {
+		desc = "No description"
+	}
+
+	book := &bookscommon.Info{
+		ISBN:        isbn,
+		Title:       volume.VolumeInfo.Title,
+		Authors:     volume.VolumeInfo.Authors,
+		Description: desc,
+		Language:    StringToLanguage(volume.VolumeInfo.Language),
+	}
+
+	date, err := StringToDate(volume.VolumeInfo.PublishedDate)
+	if err == nil {
+		book.Publishdate = date
+	}
+
+	var u *url.URL
+	if volume.VolumeInfo.ImageLinks == nil {
+		u, err = url.Parse("https://books.google.com/googlebooks/images/no_cover_thumb.gif")
+	} else {
+		u, err = url.Parse(volume.VolumeInfo.ImageLinks.Thumbnail)
+	}
+	if err == nil {
+		book.Image.Source = *u
+	}
+
+	return book, nil
 }
 
 func StringToDate(s string) (time.Time, error) {
