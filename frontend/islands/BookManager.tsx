@@ -1,6 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { BookInfo, BooksResponse } from "../types/book.ts";
-import { BookAPI } from "../utils/api.ts";
+import { BookInfo } from "../types/book.ts";
 import BookCard from "../components/BookCard.tsx";
 import SearchForm from "../components/SearchForm.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
@@ -20,12 +19,15 @@ export default function BookManager() {
     loadAllBooks();
   }, []);
 
+  // サーバ経由で全件取得
   const loadAllBooks = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await BookAPI.getAllBooks();
-      setBooks(response.books || []);
+      const res = await fetch("/api/books");
+      if (!res.ok) throw new Error("Failed to fetch books");
+      const data = await res.json();
+      setBooks(data.books || []);
       setSearchResults(null);
       setSearchQuery("");
       setPage(1);
@@ -37,7 +39,8 @@ export default function BookManager() {
     }
   };
 
-  const handleSearch = async (query: string, type: 'isbn' | 'title') => {
+  // 検索（GET パラメータを利用）
+  const handleSearch = async (query: string) => {
     setSearchLoading(true);
     setError(null);
     setSearchQuery(query);
@@ -50,13 +53,10 @@ export default function BookManager() {
     }
 
     try {
-      let response: BooksResponse;
-      if (type === 'isbn') {
-        response = await BookAPI.getBookByISBN(query);
-      } else {
-        response = await BookAPI.searchBooksByTitle(query);
-      }
-      setSearchResults(response.books || []);
+      const res = await fetch(`/api/books?title=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error("Search failed");
+      const data = await res.json();
+      setSearchResults(data.books || []);
     } catch (err) {
       setError("Search failed. Please try again.");
       console.error("Search error:", err);
@@ -65,11 +65,25 @@ export default function BookManager() {
     }
   };
 
-  const handleDelete = (isbn: string) => {
-    if (searchResults !== null) {
-      setSearchResults(searchResults.filter(book => book.ISBN !== isbn));
+  // 削除（サーバ経由）
+  const handleDelete = async (isbn: string) => {
+    try {
+      const res = await fetch("/api/books", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isbn }),
+      });
+      if (!res.ok) throw new Error("Delete failed");
+
+      // 成功したら表示から除去
+      if (searchResults !== null) {
+        setSearchResults(searchResults.filter(book => book.ISBN !== isbn));
+      }
+      setBooks(books.filter(book => book.ISBN !== isbn));
+    } catch (err) {
+      setError("Failed to delete book.");
+      console.error(err);
     }
-    setBooks(books.filter(book => book.ISBN !== isbn));
   };
 
   const displayBooks = searchResults === null ? books : searchResults;
@@ -120,6 +134,14 @@ export default function BookManager() {
                     key={book.ISBN}
                     book={book}
                     onDelete={handleDelete}
+                    onRequestDelete={async (isbn) => {
+                      const res = await fetch("/api/books", {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ isbn }),
+                      });
+                      return res.ok;
+                    }}
                   />
                 ))}
               </div>
