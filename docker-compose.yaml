@@ -1,6 +1,14 @@
 ---
 version: '3.8'
 services:
+  booksystem_proxy:
+    build: ./proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - booksystem_api
+      - booksystem_ui
   booksystem_db:
     image: mysql:latest
     container_name: booksystem_db
