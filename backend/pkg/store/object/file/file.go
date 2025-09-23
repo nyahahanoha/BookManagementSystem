@@ -10,8 +10,8 @@ import (
 	"path"
 	"strings"
 
-	storecommon "github.com/BookManagementSystem/pkg/store/common"
-	storeconfig "github.com/BookManagementSystem/pkg/store/config"
+	storecommon "github.com/BookManagementSystem/backend/pkg/store/common"
+	storeconfig "github.com/BookManagementSystem/backend/pkg/store/config"
 )
 
 type FileStore struct {

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log/slog"
 
-	bookscommon "github.com/BookManagementSystem/pkg/books/common"
-	storecommon "github.com/BookManagementSystem/pkg/store/common"
-	storeconfig "github.com/BookManagementSystem/pkg/store/config"
-	"github.com/BookManagementSystem/pkg/store/db"
-	"github.com/BookManagementSystem/pkg/store/object"
+	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
+	storecommon "github.com/BookManagementSystem/backend/pkg/store/common"
+	storeconfig "github.com/BookManagementSystem/backend/pkg/store/config"
+	"github.com/BookManagementSystem/backend/pkg/store/db"
+	"github.com/BookManagementSystem/backend/pkg/store/object"
 )
 
 type BookStore struct {

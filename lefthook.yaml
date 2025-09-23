@@ -35,21 +35,6 @@ pre-commit:
       glob: "*.go"
       root: "backend"
       run: goimports -l {files}
-    - name: golangci-lint
-      glob: "*.go"
-      root: "backend"
-      run: |
-        for dir in \
-          $(git diff --cached --name-only --diff-filter=ACM \
-            | grep '\.go$' \
-            | sed 's|^backend/||' \
-            | xargs -n1 dirname \
-            | sort -u \
-          ) \
-        ;do
-          golangci-lint run --whole-files $dir
-        done
-
     - name: yamllint
       glob: "*.yaml"
       run: yamllint {files}

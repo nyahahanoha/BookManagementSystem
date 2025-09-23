@@ -1,6 +1,6 @@
 package servicecommon
 
-import bookscommon "github.com/BookManagementSystem/pkg/books/common"
+import bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
 
 type ErrorResponse struct {
 	Error   string `json:"error"`

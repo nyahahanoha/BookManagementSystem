@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"net/url"
 
-	storeconfig "github.com/BookManagementSystem/pkg/store/config"
-	filestore "github.com/BookManagementSystem/pkg/store/object/file"
+	storeconfig "github.com/BookManagementSystem/backend/pkg/store/config"
+	filestore "github.com/BookManagementSystem/backend/pkg/store/object/file"
 )
 
 type ObjectStore interface {

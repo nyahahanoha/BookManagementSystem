@@ -23,19 +23,15 @@ services:
       - "8080:8080"
     depends_on:
       - booksystem_db
-    network_mode: host
-    privileged: true
     volumes:
-      - ./config.yaml:/app/config.yaml
+      - ./backend/config.yaml:/app/config.yaml
       - /var/lib/booksystem/service:/var/lib/booksystem
-      - /var/run/dbus:/var/run/dbus
-      - /dev/bus/usb:/dev/bus/usb
   booksystem_ui:
     build: ./frontend
     container_name: booksystem_ui
     restart: always
     environment:
-      API_BASE_URL: http://localhost:8080
+      API_BASE_URL: http://booksystem_api:8080
     ports:
       - "8000:8000"
     depends_on:

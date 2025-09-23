@@ -1,10 +1,13 @@
-package scanner
+package main
 
 import (
 	"fmt"
 	"log"
 	"log/slog"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/BookManagementSystem/scanner/mac/bluetooth"
 	"github.com/BookManagementSystem/scanner/mac/common"
@@ -44,6 +47,10 @@ func main() {
 		log.Fatalf("failed to unmarshal yaml file: %v", err)
 	}
 
+	if cfg.API == "" || cfg.Token == "" {
+		log.Fatalf("api or token is empty")
+	}
+
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	scanner, err := NewScanner(logger, cfg)
@@ -54,9 +61,39 @@ func main() {
 	if err := scanner.Connect(); err != nil {
 		log.Fatalf("failed to connect scanner: %v", err)
 	}
-	defer func() {
-		if err := scanner.Close(); err != nil {
-			log.Fatalf("failed to close scanner: %v", err)
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	ch := make(chan common.Result, 1)
+
+	go func() {
+		if err := scanner.Run(ch); err != nil {
+			log.Fatal("failed to run scanner: %w", err)
 		}
 	}()
+
+	for {
+		select {
+		case result := <-ch:
+			req, err := http.NewRequest("POST", cfg.API+"/put:"+result.ISBN, nil)
+			if err != nil {
+				logger.Error("failed to post request", slog.String("isbn", result.ISBN), slog.String("error", err.Error()))
+				continue
+			}
+			req.Header.Set("Authorization", cfg.Token)
+			client := &http.Client{}
+			_, err = client.Do(req)
+			if err != nil {
+				logger.Error("failed to post request", slog.String("isbn", result.ISBN), slog.String("error", err.Error()))
+				continue
+			}
+		case <-sigs:
+			if err := scanner.Close(); err != nil {
+				log.Fatalf("failed to close scanner: %v", err)
+				return
+			}
+			return
+		}
+	}
 }

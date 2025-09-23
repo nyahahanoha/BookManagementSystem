@@ -1,8 +1,8 @@
 package config
 
 import (
-	booksconfig "github.com/BookManagementSystem/pkg/books/config"
-	storeconfig "github.com/BookManagementSystem/pkg/store/config"
+	booksconfig "github.com/BookManagementSystem/backend/pkg/books/config"
+	storeconfig "github.com/BookManagementSystem/backend/pkg/store/config"
 )
 
 type Config struct {

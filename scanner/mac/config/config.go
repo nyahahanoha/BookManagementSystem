@@ -4,6 +4,8 @@ import "time"
 
 type Config struct {
 	Kind      ScannerComponent `yaml:"kind"`
+	API       string           `yaml:"api"`
+	Token     string           `yaml:"token"`
 	Default   DefaultConfig    `yaml:"default"`
 	Bluetooth BluetoothConfig  `yaml:"bluetooth"`
 }

@@ -3,9 +3,9 @@ package books
 import (
 	"fmt"
 
-	bookscommon "github.com/BookManagementSystem/pkg/books/common"
-	booksconfig "github.com/BookManagementSystem/pkg/books/config"
-	googlebooks "github.com/BookManagementSystem/pkg/books/google"
+	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
+	booksconfig "github.com/BookManagementSystem/backend/pkg/books/config"
+	googlebooks "github.com/BookManagementSystem/backend/pkg/books/google"
 )
 
 type Books interface {

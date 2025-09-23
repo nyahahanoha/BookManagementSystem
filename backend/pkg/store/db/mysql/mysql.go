@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"time"
 
-	bookscommon "github.com/BookManagementSystem/pkg/books/common"
-	storecommon "github.com/BookManagementSystem/pkg/store/common"
-	storeconfig "github.com/BookManagementSystem/pkg/store/config"
+	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
+	storecommon "github.com/BookManagementSystem/backend/pkg/store/common"
+	storeconfig "github.com/BookManagementSystem/backend/pkg/store/config"
 	_ "github.com/go-sql-driver/mysql"
 )
 

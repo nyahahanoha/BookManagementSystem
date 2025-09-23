@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"time"
 
-	bookscommon "github.com/BookManagementSystem/pkg/books/common"
-	booksconfig "github.com/BookManagementSystem/pkg/books/config"
+	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
+	booksconfig "github.com/BookManagementSystem/backend/pkg/books/config"
 	api "google.golang.org/api/books/v1"
 	"google.golang.org/api/option"
 )

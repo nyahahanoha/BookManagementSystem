@@ -9,14 +9,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BookManagementSystem/backend/pkg/books"
+	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
+	"github.com/BookManagementSystem/backend/pkg/config"
+	servicecommon "github.com/BookManagementSystem/backend/pkg/service/common"
+	"github.com/BookManagementSystem/backend/pkg/store"
+	storecommon "github.com/BookManagementSystem/backend/pkg/store/common"
 	"github.com/ant0ine/go-json-rest/rest"
-
-	"github.com/BookManagementSystem/pkg/books"
-	bookscommon "github.com/BookManagementSystem/pkg/books/common"
-	"github.com/BookManagementSystem/pkg/config"
-	servicecommon "github.com/BookManagementSystem/pkg/service/common"
-	"github.com/BookManagementSystem/pkg/store"
-	storecommon "github.com/BookManagementSystem/pkg/store/common"
 )
 
 type BooksService struct {
@@ -126,6 +125,7 @@ func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
 		s.lg.Error("failed to get info", slog.String("err", err.Error()))
 		return
 	}
+	s.lg.Info("Get book info", slog.String("title", info.Title), slog.String("isbn", info.ISBN))
 	if err := s.store.Put(*info); err != nil {
 		s.lg.Error("failed to put info in store", slog.String("err", err.Error()))
 		return
