@@ -136,6 +136,7 @@ func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
 func (s *BooksService) Authorization(r *rest.Request) error {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader != s.token {
+		s.lg.Error("unauthorized access attempt", slog.String("provided", authHeader))
 		return fmt.Errorf("unauthorized")
 	}
 	return nil
