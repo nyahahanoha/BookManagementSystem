@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { BookInfo } from "../types/book.ts";
-import { API_BASE_URL } from "../utils/api.ts";
+import { API_BASE_URL, TOKEN } from "../utils/api.ts";
 
 export default function BookCard({ book, onDelete }: { book: BookInfo, onDelete?: (isbn: string) => void }) {
   const title = book.Title;
@@ -32,6 +32,9 @@ export default function BookCard({ book, onDelete }: { book: BookInfo, onDelete?
     if (!isbn) return;
     const res = await fetch(`${API_BASE_URL}/book:${isbn}`, {
       method: "DELETE",
+      headers: {
+        "Authorization": `${TOKEN}`,
+      },
     });
     if (res.ok && onDelete) {
       onDelete(isbn);

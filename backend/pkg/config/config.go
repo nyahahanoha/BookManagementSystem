@@ -12,4 +12,5 @@ type Config struct {
 	ScannerConfig scannerconfig.Config `yaml:"scanner"`
 
 	Address string `yaml:"address"`
+	Token   string `yaml:"token"`
 }

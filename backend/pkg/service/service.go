@@ -28,6 +28,8 @@ type BooksService struct {
 	scanner scanner.Scanner
 	store   store.BookStore
 	api     *http.Server
+
+	token string
 }
 
 func NewBooksService(lg *slog.Logger, config config.Config) (*BooksService, error) {
@@ -54,6 +56,7 @@ func NewBooksService(lg *slog.Logger, config config.Config) (*BooksService, erro
 		api: &http.Server{
 			Addr: config.Address,
 		},
+		token: config.Token,
 	}, nil
 }
 
@@ -188,7 +191,19 @@ func (s *BooksService) Close() {
 	}
 }
 
+func (s *BooksService) Authorization(r *rest.Request) error {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader != s.token {
+		return fmt.Errorf("unauthorized")
+	}
+	return nil
+}
+
 func (s *BooksService) GetBook(w rest.ResponseWriter, r *rest.Request) {
+	if err := s.Authorization(r); err != nil {
+		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	isbn := strings.ReplaceAll(r.PathParam("isbn"), ":", "")
 
 	info, err := s.store.Get(isbn)
@@ -218,6 +233,10 @@ func (s *BooksService) GetBook(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func (s *BooksService) GetAllBooks(w rest.ResponseWriter, r *rest.Request) {
+	if err := s.Authorization(r); err != nil {
+		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	books, err := s.store.GetAll()
 	if err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
@@ -235,6 +254,10 @@ func (s *BooksService) GetAllBooks(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func (s *BooksService) SearchBook(w rest.ResponseWriter, r *rest.Request) {
+	if err := s.Authorization(r); err != nil {
+		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	rawTitle := r.PathParam("title")
 	decodedTitle, err := url.PathUnescape(rawTitle)
 	if err != nil {
@@ -259,6 +282,10 @@ func (s *BooksService) SearchBook(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func (s *BooksService) Delete(w rest.ResponseWriter, r *rest.Request) {
+	if err := s.Authorization(r); err != nil {
+		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	isbn := strings.ReplaceAll(r.PathParam("isbn"), ":", "")
 
 	if err := s.store.Del(isbn); err != nil {

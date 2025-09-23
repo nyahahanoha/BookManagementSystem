@@ -1,5 +1,5 @@
 import { useState, useEffect } from "preact/hooks";
-import { API_BASE_URL } from "../utils/api.ts";
+//import { API_BASE_URL } from "../utils/api.ts";
 
 interface SearchFormProps {
   onSearch: (query: string, type: 'isbn' | 'title') => void;
@@ -8,7 +8,7 @@ interface SearchFormProps {
 
 export default function SearchForm({ onSearch, loading }: SearchFormProps) {
   const [scanning, setScanning] = useState(false);
-  const [scanLoading, setScanLoading] = useState(false);
+  //const [scanLoading, setScanLoading] = useState(false);
 
   // 初期化時にlocalStorageから状態復元
   useEffect(() => {
@@ -29,23 +29,24 @@ export default function SearchForm({ onSearch, loading }: SearchFormProps) {
     onSearch(query.trim(), searchType);
   };
 
-  const handleScanToggle = async () => {
-    setScanLoading(true);
-    try {
-      const endpoint = scanning ? "scan:stop" : "scan:start";
-      await fetch(`${API_BASE_URL}/${endpoint}`, { method: "POST" });
-      setScanning(!scanning);
-    } catch (err) {
-      // エラー処理は必要に応じて
-    } finally {
-      setScanLoading(false);
-    }
-  };
+  //const handleScanToggle = async () => {
+  //  setScanLoading(true);
+  //  try {
+  //    const endpoint = scanning ? "scan:stop" : "scan:start";
+  //    await fetch(`${API_BASE_URL}/${endpoint}`, { method: "POST" });
+  //    setScanning(!scanning);
+  //  } catch (err) {
+  //    // エラー処理は必要に応じて
+  //  } finally {
+  //    setScanLoading(false);
+  //  }
+  //};
 
   return (
     <div class="searchform-blue-bg">
       <div class="searchform-header-row">
         <h2 class="searchform-blue-title">Book Search</h2>
+        {/*
         <button
           type="button"
           class={`scan-btn${scanning ? " scan-btn-active" : ""}`}
@@ -58,6 +59,7 @@ export default function SearchForm({ onSearch, loading }: SearchFormProps) {
               ? "Stop Scan"
               : "Start Scan"}
         </button>
+        */}
       </div>
       <form onSubmit={handleSubmit} class="searchform-blue-form">
         <input
