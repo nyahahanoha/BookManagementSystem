@@ -1,8 +1,8 @@
 // utils/api.ts
 import { BookInfo, BooksResponse } from "../types/book.ts";
 
-export const API_BASE_URL = "http://localhost:8080";
-export const TOKEN = "eqVVujtPwO0Xs6G0bX1Qjs3j3^G6$M";
+export const API_BASE_URL = Deno.env.get("API_BASE_URL") || "http://localhost:8080";
+export const TOKEN = Deno.env.get("API_TOKEN");
 
 export class BookAPI {
   static async getAllBooks(): Promise<BooksResponse> {
