@@ -21,7 +21,7 @@ import (
 type BooksService struct {
 	lg *slog.Logger
 
-	books books.Books
+	books []books.Books
 	store store.BookStore
 	api   *http.Server
 
@@ -120,10 +120,39 @@ func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
 
 	isbn := strings.ReplaceAll(r.PathParam("isbn"), ":", "")
 
-	info, err := s.books.GetInfo(isbn)
+	var info *bookscommon.Info
+	info, err := s.books[0].GetInfo(isbn)
 	if err != nil {
 		s.lg.Error("failed to get info", slog.String("err", err.Error()))
 		return
+	}
+
+	for _, b := range s.books[1:] {
+		moreInfo, err := b.GetInfo(isbn)
+		fmt.Printf("defaultInfo: %+v\n", info)
+		fmt.Printf("moreInfo:    %+v\n", moreInfo)
+		if err != nil {
+			s.lg.Warn("failed to get info from another source", slog.String("err", err.Error()))
+			continue
+		}
+		if info.Description == bookscommon.NoDescription && moreInfo.Description != bookscommon.NoDescription {
+			info.Description = moreInfo.Description
+		}
+		if info.Image.Source.String() == "" && moreInfo.Image.Source.String() != "" {
+			info.Image = moreInfo.Image
+		}
+		if info.Language == bookscommon.UNKOWN && moreInfo.Language != bookscommon.UNKOWN {
+			info.Language = moreInfo.Language
+		}
+		if info.Publishdate.IsZero() && !moreInfo.Publishdate.IsZero() {
+			info.Publishdate = moreInfo.Publishdate
+		}
+		if len(info.Authors) == 0 && len(moreInfo.Authors) != 0 {
+			info.Authors = moreInfo.Authors
+		}
+		if info.Title == "" && moreInfo.Title != "" {
+			info.Title = moreInfo.Title
+		}
 	}
 	s.lg.Info("Get book info", slog.String("title", info.Title), slog.String("isbn", info.ISBN))
 	if err := s.store.Put(*info); err != nil {

@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _BooksComponentName = "Google"
+const _BooksComponentName = "GoogleNDL"
 
-var _BooksComponentIndex = [...]uint8{0, 6}
+var _BooksComponentIndex = [...]uint8{0, 6, 9}
 
-const _BooksComponentLowerName = "google"
+const _BooksComponentLowerName = "googlendl"
 
 func (i BooksComponent) String() string {
 	if i >= BooksComponent(len(_BooksComponentIndex)-1) {
@@ -25,17 +25,21 @@ func (i BooksComponent) String() string {
 func _BooksComponentNoOp() {
 	var x [1]struct{}
 	_ = x[Google-(0)]
+	_ = x[NDL-(1)]
 }
 
-var _BooksComponentValues = []BooksComponent{Google}
+var _BooksComponentValues = []BooksComponent{Google, NDL}
 
 var _BooksComponentNameToValueMap = map[string]BooksComponent{
 	_BooksComponentName[0:6]:      Google,
 	_BooksComponentLowerName[0:6]: Google,
+	_BooksComponentName[6:9]:      NDL,
+	_BooksComponentLowerName[6:9]: NDL,
 }
 
 var _BooksComponentNames = []string{
 	_BooksComponentName[0:6],
+	_BooksComponentName[6:9],
 }
 
 // BooksComponentString retrieves an enum value from the enum constants string name.

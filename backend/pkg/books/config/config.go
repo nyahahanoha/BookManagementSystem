@@ -1,7 +1,7 @@
 package booksconfig
 
 type Config struct {
-	Kind   BooksComponent    `yaml:"kind"`
+	Kind   []BooksComponent  `yaml:"kind"`
 	Google GoogleBooksConfig `yaml:"google"`
 }
 
@@ -10,6 +10,7 @@ type BooksComponent uint32
 
 const (
 	Google BooksComponent = iota
+	NDL
 )
 
 type GoogleBooksConfig struct {

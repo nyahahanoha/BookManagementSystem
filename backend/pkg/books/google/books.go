@@ -88,7 +88,7 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 	} else if volume.SearchInfo != nil {
 		desc = volume.SearchInfo.TextSnippet
 	} else {
-		desc = "No description"
+		desc = bookscommon.NoDescription
 	}
 
 	book := &bookscommon.Info{
@@ -105,13 +105,11 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 	}
 
 	var u *url.URL
-	if volume.VolumeInfo.ImageLinks == nil {
-		u, err = url.Parse("https://books.google.com/googlebooks/images/no_cover_thumb.gif")
-	} else {
+	if volume.VolumeInfo.ImageLinks != nil {
 		u, err = url.Parse(volume.VolumeInfo.ImageLinks.Thumbnail)
-	}
-	if err == nil {
-		book.Image.Source = *u
+		if err == nil {
+			book.Image.Source = *u
+		}
 	}
 
 	return book, nil
