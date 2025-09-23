@@ -44,6 +44,6 @@ services:
       API_BASE_URL: http://books_api.example.com:8080
       TOKEN: ${TOKEN}
     ports:
-      - "443:8000"
+      - "8080:8000"
     depends_on:
       - booksystem_api
