@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/BookManagementSystem/scanner/mac/scanner/bluetooth"
-	"github.com/BookManagementSystem/scanner/mac/scanner/common"
-	"github.com/BookManagementSystem/scanner/mac/scanner/config"
+	"github.com/BookManagementSystem/scanner/mac/bluetooth"
+	"github.com/BookManagementSystem/scanner/mac/common"
+	"github.com/BookManagementSystem/scanner/mac/config"
 	"go.yaml.in/yaml/v2"
 )
 
@@ -18,10 +18,10 @@ type Scanner interface {
 	Close() error
 }
 
-func NewScanner(lg *slog.Logger, config config.Config) (Scanner, error) {
-	switch config.Kind {
+func NewScanner(lg *slog.Logger, c config.Config) (Scanner, error) {
+	switch c.Kind {
 	case config.Bluetooth:
-		bluetooth, err := bluetooth.NewBluetooth(lg, config.Bluetooth)
+		bluetooth, err := bluetooth.NewBluetooth(lg, c.Bluetooth)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create bluetooth: %w", err)
 		}
