@@ -59,10 +59,7 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 			continue
 		}
 
-		if len(itemFullTitle) > len(volumeFullTitle) {
-			volume = item
-			continue
-		}
+		otherTitle = append(otherTitle, itemFullTitle)
 
 		itemDate, err := StringToDate(item.VolumeInfo.PublishedDate)
 		if err != nil {
@@ -70,14 +67,12 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 		}
 		volumeDate, err := StringToDate(volume.VolumeInfo.PublishedDate)
 		if err != nil {
-			volume = item
+			volume.VolumeInfo.PublishedDate = item.VolumeInfo.PublishedDate
 			continue
 		}
 
-		otherTitle = append(otherTitle, itemFullTitle)
-
 		if itemDate.After(volumeDate) {
-			volume = item
+			volume.VolumeInfo.PublishedDate = item.VolumeInfo.PublishedDate
 			continue
 		}
 	}
