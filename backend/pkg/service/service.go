@@ -128,11 +128,12 @@ func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
 
 	for _, b := range s.books[1:] {
 		moreInfo, err := b.GetInfo(isbn)
-		fmt.Printf("defaultInfo: %+v\n", info)
-		fmt.Printf("moreInfo:    %+v\n", moreInfo)
 		if err != nil {
 			s.lg.Warn("failed to get info from another source", slog.String("err", err.Error()))
 			continue
+		}
+		if info == nil {
+			info = moreInfo
 		}
 		if info.Description == bookscommon.NoDescription && moreInfo.Description != bookscommon.NoDescription || info.Description == "" {
 			info.Description = moreInfo.Description
