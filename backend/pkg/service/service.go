@@ -124,7 +124,6 @@ func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
 	info, err := s.books[0].GetInfo(isbn)
 	if err != nil {
 		s.lg.Error("failed to get info", slog.String("err", err.Error()))
-		return
 	}
 
 	for _, b := range s.books[1:] {
@@ -135,7 +134,7 @@ func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
 			s.lg.Warn("failed to get info from another source", slog.String("err", err.Error()))
 			continue
 		}
-		if info.Description == bookscommon.NoDescription && moreInfo.Description != bookscommon.NoDescription {
+		if info.Description == bookscommon.NoDescription && moreInfo.Description != bookscommon.NoDescription || info.Description == "" {
 			info.Description = moreInfo.Description
 		}
 		if info.Image.Source.String() == "" && moreInfo.Image.Source.String() != "" {
@@ -153,6 +152,9 @@ func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
 		if info.Title == "" && moreInfo.Title != "" {
 			info.Title = moreInfo.Title
 		}
+	}
+	if info.Title == "" {
+		info.Title = isbn
 	}
 	s.lg.Info("Get book info", slog.String("title", info.Title), slog.String("isbn", info.ISBN))
 	if err := s.store.Put(*info); err != nil {
