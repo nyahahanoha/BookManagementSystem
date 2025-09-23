@@ -14,8 +14,6 @@ import (
 	"github.com/BookManagementSystem/pkg/books"
 	bookscommon "github.com/BookManagementSystem/pkg/books/common"
 	"github.com/BookManagementSystem/pkg/config"
-	"github.com/BookManagementSystem/pkg/scanner"
-	scannercommon "github.com/BookManagementSystem/pkg/scanner/common"
 	servicecommon "github.com/BookManagementSystem/pkg/service/common"
 	"github.com/BookManagementSystem/pkg/store"
 	storecommon "github.com/BookManagementSystem/pkg/store/common"
@@ -24,10 +22,9 @@ import (
 type BooksService struct {
 	lg *slog.Logger
 
-	books   books.Books
-	scanner scanner.Scanner
-	store   store.BookStore
-	api     *http.Server
+	books books.Books
+	store store.BookStore
+	api   *http.Server
 
 	token string
 }
@@ -38,21 +35,15 @@ func NewBooksService(lg *slog.Logger, config config.Config) (*BooksService, erro
 		return nil, fmt.Errorf("faild to create books: %w", err)
 	}
 
-	scanner, err := scanner.NewScanner(lg, config.ScannerConfig)
-	if err != nil {
-		return nil, fmt.Errorf("faild to create scanner: %w", err)
-	}
-
 	store, err := store.NewBooksStore(lg, config.StoreConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create store: %w", err)
 	}
 
 	return &BooksService{
-		lg:      lg.With(slog.String("Package", "service")),
-		books:   books,
-		scanner: scanner,
-		store:   *store,
+		lg:    lg.With(slog.String("Package", "service")),
+		books: books,
+		store: *store,
 		api: &http.Server{
 			Addr: config.Address,
 		},
@@ -68,7 +59,7 @@ func (s *BooksService) Listen() error {
 		rest.Get("/books", s.GetAllBooks),
 		rest.Get("/book:isbn", s.GetBook),
 		rest.Get("/books/search:title", s.SearchBook),
-		rest.Post("/scan:action", s.Scan),
+		rest.Post("/put:isbn", s.Put),
 		rest.Delete("/book:isbn", s.Delete),
 	)
 	if err != nil {
@@ -122,73 +113,24 @@ func CORSMiddleware() rest.Middleware {
 	})
 }
 
-func (s *BooksService) Scan(w rest.ResponseWriter, r *rest.Request) {
-	action := strings.ReplaceAll(r.PathParam("action"), ":", "")
-	switch action {
-	case "start":
-		s.Start()
-	case "stop":
-		s.Close()
-	default:
-		rest.Error(w, "Bad Request", http.StatusBadRequest)
-		return
-	}
-	w.WriteHeader(http.StatusAccepted)
-}
-
-func (s *BooksService) Start() {
-	s.lg.Info("Running BooksService")
-	ch := make(chan scannercommon.Result)
-
-	if err := s.scanner.Connect(); err != nil {
-		s.lg.Error("failed to connect scanner", slog.String("err", err.Error()))
+func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
+	if err := s.Authorization(r); err != nil {
+		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	go func() {
-		for {
-			result, ok := <-ch
-			if !ok {
-				s.lg.Info("Stop running BooksService")
-				return
-			}
-			go func(result scannercommon.Result) {
-				info, err := s.books.GetInfo(result.ISBN)
-				if err != nil {
-					s.lg.Error("failed to get info", slog.String("err", err.Error()))
-					return
-				}
-				if err := s.store.Put(*info); err != nil {
-					s.lg.Error("failed to put info in store", slog.String("err", err.Error()))
-					return
-				}
-				book, err := s.store.Get(result.ISBN)
-				if err != nil {
-					s.lg.Error("failed to get info in store", slog.String("err", err.Error()))
-					return
-				}
-				s.lg.Info("Get Book Info",
-					slog.Any("info", book),
-				)
-			}(result)
-		}
-	}()
+	isbn := strings.ReplaceAll(r.PathParam("isbn"), ":", "")
 
-	go func() {
-		if err := s.scanner.Run(ch); err != nil {
-			s.lg.Error("failed to running scanner", slog.String("err", err.Error()))
-		}
-	}()
-}
-
-func (s *BooksService) Close() {
-	s.lg.Info("Close BooksService")
-	if err := s.books.Close(); err != nil {
-		s.lg.Error("Failed to close books", slog.String("err", err.Error()))
+	info, err := s.books.GetInfo(isbn)
+	if err != nil {
+		s.lg.Error("failed to get info", slog.String("err", err.Error()))
+		return
 	}
-	if err := s.scanner.Close(); err != nil {
-		s.lg.Error("Failed to close scanner", slog.String("err", err.Error()))
+	if err := s.store.Put(*info); err != nil {
+		s.lg.Error("failed to put info in store", slog.String("err", err.Error()))
+		return
 	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (s *BooksService) Authorization(r *rest.Request) error {
