@@ -74,7 +74,7 @@ func (s *BooksService) Listen() error {
 		api.MakeHandler().ServeHTTP(w, r)
 	})
 	s.lg.Info("Start Listen Service", slog.String("address", s.api.Addr))
-	if err := s.api.ListenAndServeTLS("./cert.pem", "./cert.key"); err != nil && err != http.ErrServerClosed {
+	if err := s.api.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return fmt.Errorf("failed to serve: %w", err)
 	}
 
