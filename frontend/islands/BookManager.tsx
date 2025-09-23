@@ -14,6 +14,7 @@ export default function BookManager() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState(1);
+  const [searchType, setSearchType] = useState<"isbn" | "title">("title");
 
   useEffect(() => {
     loadAllBooks();
@@ -40,10 +41,11 @@ export default function BookManager() {
   };
 
   // 検索（GET パラメータを利用）
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, type: 'isbn' | 'title') => {
     setSearchLoading(true);
     setError(null);
     setSearchQuery(query);
+    setSearchType(type);
     setPage(1);
 
     if (query.trim() === "") {
@@ -53,7 +55,9 @@ export default function BookManager() {
     }
 
     try {
-      const res = await fetch(`/api/books?title=${encodeURIComponent(query)}`);
+      // type によって API のクエリキーを切り替え
+      const param = type === "isbn" ? "isbn" : "title";
+      const res = await fetch(`/api/books?${param}=${encodeURIComponent(query)}`);
       if (!res.ok) throw new Error("Search failed");
       const data = await res.json();
       setSearchResults(data.books || []);

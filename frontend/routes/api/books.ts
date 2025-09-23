@@ -3,17 +3,22 @@ import { Handlers } from "$fresh/server.ts";
 import { BooksResponse } from "../../types/book.ts";
 
 const API_BASE_URL = Deno.env.get("API_BASE_URL") || "https://api.example.com";
-const TOKEN = Deno.env.get("API_TOKEN") || "";
+const TOKEN = Deno.env.get("TOKEN") || "";
 
 export const handler: Handlers = {
   GET: async (req) => {
     const url = new URL(req.url);
     const title = url.searchParams.get("title");
+    const isbn = url.searchParams.get("isbn");
 
     let apiUrl = `${API_BASE_URL}/books`;
-    if (title) {
-      const encodedTitle = encodeURIComponent(title);
-      apiUrl = `${API_BASE_URL}/books/search:${encodedTitle}`;
+
+    if (isbn) {
+      // ISBN検索
+      apiUrl = `${API_BASE_URL}/book:${encodeURIComponent(isbn)}`;
+    } else if (title) {
+      // タイトル検索
+      apiUrl = `${API_BASE_URL}/books/search:${encodeURIComponent(title)}`;
     }
 
     const res = await fetch(apiUrl, {
