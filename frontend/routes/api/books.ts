@@ -2,8 +2,8 @@
 import { Handlers } from "$fresh/server.ts";
 import { BooksResponse } from "../../types/book.ts";
 
-const API_BASE_URL = Deno.env.get("API_BASE_URL") || "https://api.example.com";
-const TOKEN = Deno.env.get("TOKEN") || "";
+const API_BASE_URL = Deno.env.get("BOOKS_API_BASE_URL") || "http://localhost:8080";
+const TOKEN = Deno.env.get("BOOKS_API_TOKEN") || "";
 
 export const handler: Handlers = {
   GET: async (req) => {
@@ -35,6 +35,15 @@ export const handler: Handlers = {
       method: "DELETE",
       headers: { "Authorization": TOKEN },
     });
-    return new Response(res.status === 200 ? "Deleted" : "Failed", { status: res.status });
+    if (res.status === 200) {
+      // 削除成功で 200 → body あり
+      return new Response("Deleted", { status: 200 });
+    } else if (res.status === 204) {
+      // 削除成功で 204 → body なし
+      return new Response(null, { status: 204 });
+    } else {
+      // 失敗
+      return new Response("Failed", { status: res.status });
+    }
   },
 };

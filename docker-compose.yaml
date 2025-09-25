@@ -4,6 +4,7 @@ services:
   booksystem_proxy:
     image: nginx:latest
     container_name: booksystem_proxy
+    restart: always
     ports:
       - "80:80"
       - "443:443"
@@ -12,38 +13,34 @@ services:
       - booksystem_ui
     volumes:
       - ./proxy/certs:/etc/ssl/certs
-      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/nginx.conf
   booksystem_db:
     image: mysql:latest
     container_name: booksystem_db
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: booksystem_db
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      TZ: "Asia/Tokyo"
-    ports:
-      - "3306:3306"
+    env_file:
+      - .envrc
+    volumes:
+      - db:/var/lib/mysql
   booksystem_api:
     build: ./backend
     container_name: booksystem_api
     restart: always
-    ports:
-      - "8080:8080"
     depends_on:
       - booksystem_db
+    env_file:
+      - .envrc
     volumes:
       - ./backend/config.yaml:/app/config.yaml
-      - /var/lib/booksystem/service:/var/lib/booksystem
+      - booksystem:/var/lib/booksystem
   booksystem_ui:
     build: ./frontend
     container_name: booksystem_ui
     restart: always
-    environment:
-      API_BASE_URL: http://books_api.example.com:8080
-      TOKEN: ${TOKEN}
-    ports:
-      - "8080:8000"
+    env_file:
+      - .envrc
     depends_on:
       - booksystem_api
+volumes:
+  db:
+  booksystem:

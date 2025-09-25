@@ -3,7 +3,6 @@ import { useState, useEffect } from "preact/hooks";
 
 export default function BookCard({
   book,
-  onDelete,
   onRequestDelete, // サーバ経由で削除する関数を親から渡す
 }: {
   book: BookInfo;
@@ -17,6 +16,7 @@ export default function BookCard({
   const isbn = book.ISBN;
   const publishdate = book.Publishdate;
   const language = LanguageMap[book.Language] || "Unknown";
+  const [deleted, setDeleted] = useState(false); // ← ボタン状態
 
   const [imageUrl, setImageUrl] = useState<string>(imageFileName || "");
 
@@ -40,8 +40,8 @@ export default function BookCard({
   const handleDelete = async () => {
     if (!isbn || !onRequestDelete) return;
     const success = await onRequestDelete(isbn); // サーバに削除依頼
-    if (success && onDelete) {
-      onDelete(isbn); // 親に削除成功通知
+    if (success) {
+      setDeleted(true); // ← 削除成功なら状態更新
     }
   };
 
@@ -68,8 +68,12 @@ export default function BookCard({
             <span class="bookcard-horizontal-date">{yearMonth}</span>
             <span class="bookcard-horizontal-date">{language}</span>
           </div>
-          <button class="bookcard-delete-btn" onClick={handleDelete}>
-            Delete
+          <button
+            class={`bookcard-delete-btn ${deleted ? "deleted" : ""}`}
+            onClick={handleDelete}
+            disabled={deleted} // ← 一度押したら押せなくする
+          >
+            {deleted ? "Deleted" : "Delete"}
           </button>
         </div>
       </div>

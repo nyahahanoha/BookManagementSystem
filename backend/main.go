@@ -18,6 +18,8 @@ func main() {
 		log.Fatalf("failed to reaf yaml file: %v", err)
 	}
 
+	file = []byte(os.ExpandEnv(string(file)))
+
 	var cfg config.Config
 	if err := yaml.Unmarshal(file, &cfg); err != nil {
 		log.Fatalf("failed to unmarshal yaml file: %v", err)

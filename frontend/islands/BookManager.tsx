@@ -69,26 +69,26 @@ export default function BookManager() {
     }
   };
 
-  // 削除（サーバ経由）
-  const handleDelete = async (isbn: string) => {
-    try {
-      const res = await fetch("/api/books", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isbn }),
-      });
-      if (!res.ok) throw new Error("Delete failed");
-
-      // 成功したら表示から除去
-      if (searchResults !== null) {
-        setSearchResults(searchResults.filter(book => book.ISBN !== isbn));
-      }
-      setBooks(books.filter(book => book.ISBN !== isbn));
-    } catch (err) {
-      setError("Failed to delete book.");
-      console.error(err);
-    }
-  };
+//  // 削除（サーバ経由）
+//  const handleDelete = async (isbn: string) => {
+//    try {
+//      const res = await fetch("/api/books", {
+//        method: "DELETE",
+//        headers: { "Content-Type": "application/json" },
+//        body: JSON.stringify({ isbn }),
+//      });
+//      if (!res.ok) throw new Error("Delete failed");
+//
+//      // 成功したら表示から除去
+//      if (searchResults !== null) {
+//        setSearchResults(searchResults.filter(book => book.ISBN !== isbn));
+//      }
+//      setBooks(books.filter(book => book.ISBN !== isbn));
+//    } catch (err) {
+//      setError("Failed to delete book.");
+//      console.error(err);
+//    }
+//  };
 
   const displayBooks = searchResults === null ? books : searchResults;
   const isEmpty = !displayBooks || displayBooks.length === 0;
@@ -137,13 +137,16 @@ export default function BookManager() {
                   <BookCard
                     key={book.ISBN}
                     book={book}
-                    onDelete={handleDelete}
+                    //onDelete={handleDelete}
                     onRequestDelete={async (isbn) => {
                       const res = await fetch("/api/books", {
                         method: "DELETE",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ isbn }),
                       });
+
+                      console.log("Status: ", res.status); // 204
+                      console.log("Status bool: ", res.ok);     // true
                       return res.ok;
                     }}
                   />

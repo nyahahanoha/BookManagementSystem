@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 
-const API_BASE_URL = Deno.env.get("API_BASE_URL") || "http://localhost:8080";
-const TOKEN = Deno.env.get("TOKEN") || "";
+const API_BASE_URL = Deno.env.get("BOOKS_API_BASE_URL") || "http://localhost:8080";
+const TOKEN = Deno.env.get("BOOKS_API_TOKEN") || "";
 
 export const handler: Handlers = {
   GET: async (req) => {

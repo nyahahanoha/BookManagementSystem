@@ -353,6 +353,29 @@
   color: #fff;
 }
 
+.bookcard-delete-btn.deleted {
+  margin-left: 1.5rem;
+  background: linear-gradient(90deg, #43a047 0%, #2e7d32 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.6rem 0.9rem;
+  font-weight: 900;
+  font-size: 1.05rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #b71c1c44;
+  transition: background 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.03em;
+  text-align: center;
+  min-width: 90px;
+}
+
+.bookcard-delete-btn.deleted:hover {
+  background: linear-gradient(90deg, #2e7d32 0%, #43a047 100%);
+  box-shadow: 0 4px 16px #43a04755;
+  color: #fff;
+}
+
 /* LoadingSpinner */
 .spinner-dark {
   display: flex;
