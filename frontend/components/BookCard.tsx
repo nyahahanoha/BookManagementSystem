@@ -38,6 +38,7 @@ export default function BookCard({
   }
 
   const handleDelete = async () => {
+    if (deleted) return; // ← 既に削除済みなら何もしない
     if (!isbn || !onRequestDelete) return;
     const success = await onRequestDelete(isbn); // サーバに削除依頼
     if (success) {

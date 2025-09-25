@@ -144,9 +144,6 @@ export default function BookManager() {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ isbn }),
                       });
-
-                      console.log("Status: ", res.status); // 204
-                      console.log("Status bool: ", res.ok);     // true
                       return res.ok;
                     }}
                   />

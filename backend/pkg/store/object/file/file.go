@@ -10,7 +10,6 @@ import (
 	"path"
 	"strings"
 
-	storecommon "github.com/BookManagementSystem/backend/pkg/store/common"
 	storeconfig "github.com/BookManagementSystem/backend/pkg/store/config"
 )
 
@@ -99,5 +98,5 @@ func (s *FileStore) Delete(isbn string) error {
 		}
 	}
 
-	return fmt.Errorf("failed to delete file: %w", storecommon.ErrNotFoundBook)
+	return nil
 }
