@@ -69,13 +69,15 @@ export default function BookCard({
             <span class="bookcard-horizontal-date">{yearMonth}</span>
             <span class="bookcard-horizontal-date">{language}</span>
           </div>
-          <button
-            class={`bookcard-delete-btn ${deleted ? "deleted" : ""}`}
-            onClick={handleDelete}
-            disabled={deleted} // ← 一度押したら押せなくする
-          >
-            {deleted ? "Deleted" : "Delete"}
-          </button>
+          {onRequestDelete && (
+            <button
+              class={`bookcard-delete-btn ${deleted ? "deleted" : ""}`}
+              onClick={handleDelete}
+              disabled={deleted}
+            >
+              {deleted ? "Deleted" : "Delete"}
+            </button>
+          )}
         </div>
       </div>
     </div>

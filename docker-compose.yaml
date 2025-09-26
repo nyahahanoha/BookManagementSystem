@@ -2,7 +2,7 @@
 version: '3.8'
 services:
   booksystem_proxy:
-    image: nginx:latest
+    image: pomerium/pomerium:latest
     container_name: booksystem_proxy
     restart: always
     ports:
@@ -11,9 +11,12 @@ services:
     depends_on:
       - booksystem_api
       - booksystem_ui
+    env_file:
+      - .envrc
     volumes:
-      - ./proxy/certs:/etc/ssl/certs
-      - ./proxy/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - /etc/letsencrypt:/pomerium/certs:ro
+      - ./proxy/private.pem:/pomerium/private.pem
+      - ./proxy/config.yaml:/pomerium/config.yaml
   booksystem_db:
     image: mysql:latest
     container_name: booksystem_db
@@ -21,7 +24,7 @@ services:
     env_file:
       - .envrc
     volumes:
-      - db:/var/lib/mysql
+      - db_data:/var/lib/mysql
   booksystem_api:
     build: ./backend
     container_name: booksystem_api
@@ -32,7 +35,7 @@ services:
       - .envrc
     volumes:
       - ./backend/config.yaml:/app/config.yaml
-      - booksystem:/var/lib/booksystem
+      - object_data:/var/lib/booksystem
   booksystem_ui:
     build: ./frontend
     container_name: booksystem_ui
@@ -41,6 +44,28 @@ services:
       - .envrc
     depends_on:
       - booksystem_api
+  verify:
+    image: pomerium/verify:latest
+    expose:
+      - 8000
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    entrypoint: 
+      - /bin/sh
+      - -c
+      - |
+        while true; do
+          certbot renew \
+            --dns-cloudflare \
+            --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
+            --non-interactive \
+            --agree-tos
+          sleep 10d
+        done
+    restart: unless-stopped
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
 volumes:
-  db:
-  booksystem:
+  db_data:
+  object_data:

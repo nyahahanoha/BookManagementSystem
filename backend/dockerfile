@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 RUN go mod tidy
-RUN GOOS=linux GOARCH=arm64 go build -o bookMgmtSystem main.go
+RUN GOOS=linux GOARCH=amd64 go build -o bookMgmtSystem main.go
 
 # 実行用（Alpine など軽量イメージ）
 FROM ubuntu:latest

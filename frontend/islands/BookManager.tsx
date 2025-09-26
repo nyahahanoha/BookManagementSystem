@@ -4,9 +4,13 @@ import BookCard from "../components/BookCard.tsx";
 import SearchForm from "../components/SearchForm.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 30;
 
-export default function BookManager() {
+interface Props {
+  canDelete: boolean;
+}
+
+export default function BookManager({ canEdit }: Props) {
   const [books, setBooks] = useState<BookInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -138,14 +142,16 @@ export default function BookManager() {
                     key={book.ISBN}
                     book={book}
                     //onDelete={handleDelete}
-                    onRequestDelete={async (isbn) => {
-                      const res = await fetch("/api/books", {
-                        method: "DELETE",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ isbn }),
-                      });
-                      return res.ok;
-                    }}
+                    {...(canEdit && {
+                      onRequestDelete: async (isbn: string) => {
+                        const res = await fetch("/api/books", {
+                          method: "DELETE",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ isbn }),
+                        });
+                        return res.ok;
+                      },
+                    })}
                   />
                 ))}
               </div>

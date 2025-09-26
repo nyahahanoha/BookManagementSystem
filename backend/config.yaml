@@ -1,0 +1,23 @@
+books:
+  kind:
+    - NDL
+    - Google
+  google:
+    api_key: ${GOOGLE_BOOKS_API_TOKEN}
+store:
+  db:
+    kind: MySQL
+    mysql:
+      address: booksystem_db
+      port: 3306
+      user: ${MYSQL_USER}
+      password: ${MYSQL_PASSWORD}
+      database: ${MYSQL_DATABASE}
+  object:
+    kind: FileSystem
+    file:
+      path: /var/lib/booksystem
+
+address: ":8080"
+token: ${BOOKS_API_TOKEN}
+
