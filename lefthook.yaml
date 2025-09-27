@@ -35,10 +35,14 @@ pre-commit:
       glob: "*.go"
       root: "backend"
       run: goimports -l {files}
+    - name: golangci-lint
+      glob: "*.go"
+      root: "backend"
+      run: golangci-lint {files}
+
     - name: yamllint
       glob: "*.yaml"
       run: yamllint {files}
-
     - name: tomllint
       glob: "*.toml"
       run: taplo lint {files}

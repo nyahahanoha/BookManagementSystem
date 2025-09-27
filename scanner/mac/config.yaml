@@ -1,0 +1,8 @@
+kind: Bluetooth
+token: ${BOOKS_API_TOKEN}
+api: https://books_api.nyahahanoha.net
+bluetooth:
+  name: HPRT-81BF
+  service: 0000ff00-0000-1000-8000-00805f9b34fb
+  characteristic: 0000ff01-0000-1000-8000-00805f9b34fb
+  timeout: 30s
