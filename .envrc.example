@@ -1,0 +1,17 @@
+export MYSQL_ROOT_PASSWORD=
+export MYSQL_USER=
+export MYSQL_DATABASE=
+export MYSQL_PASSWORD=
+
+export BOOKS_API_BASE_URL=http://booksystem_api:8080
+export BOOKS_API_TOKEN=
+export GOOGLE_BOOKS_API_TOKEN=
+
+export IDP_PROVIDER=auth0
+export IDP_CLIENT_ID=
+export IDP_CLIENT_SECRET=
+export IDP_PROVIDER_URL=
+export COOKIE_SECRET=
+export SHARED_SECRET=
+export ADMIN_EMAILS=
+
