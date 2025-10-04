@@ -1,24 +1,4 @@
 ---
-# EXAMPLE USAGE:
-#
-#   Refer for explanation to following link:
-#   https://lefthook.dev/configuration/
-#
-# pre-push:
-#   jobs:
-#     - name: packages audit
-#       tags:
-#         - frontend
-#         - security
-#       run: yarn audit
-#
-#     - name: gems audit
-#       tags:
-#         - backend
-#         - security
-#       run: bundle audit
-#
-
 pre-commit:
   parallel: true
   files: git diff --name-only --cached
@@ -38,7 +18,7 @@ pre-commit:
     - name: golangci-lint
       glob: "*.go"
       root: "backend"
-      run: golangci-lint {files}
+      run: golangci-lint run $(for file in {files}; do dirname "$file"; done | sort -u)
 
     - name: yamllint
       glob: "*.yaml"
