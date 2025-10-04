@@ -208,6 +208,13 @@ func (s *MySQL) Search(title string) ([]bookscommon.Info, error) {
 	return books, nil
 }
 
+func (s *MySQL) Rename(isbn, title string) error {
+	if err := s.db.QueryRow(`UPDATE books SET title = ? WHERE isbn = ?`, title, isbn); err.Err() != nil {
+		return fmt.Errorf("failed to rename book: %w", err.Err())
+	}
+	return nil
+}
+
 func (s *MySQL) rowConvertInfo(rows *sql.Rows) ([]bookscommon.Info, error) {
 	var books []bookscommon.Info
 	for rows.Next() {
