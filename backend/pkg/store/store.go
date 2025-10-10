@@ -36,6 +36,16 @@ func NewBooksStore(lg *slog.Logger, config storeconfig.Config) (*BookStore, erro
 	}, nil
 }
 
+func (s *BookStore) Close() error {
+	if err := s.db.Close(); err != nil {
+		return fmt.Errorf("failed to close db: %w", err)
+	}
+	if err := s.object.Close(); err != nil {
+		return fmt.Errorf("failed to close object: %w", err)
+	}
+	return nil
+}
+
 func (s *BookStore) Put(book bookscommon.Info) error {
 	if err := s.db.Put(book); err != nil {
 		return fmt.Errorf("failed to put info in db: %w", err)

@@ -13,6 +13,7 @@ type ObjectStore interface {
 	Put(url url.URL, isbn string) error
 	Get(isbn string) (string, error)
 	Delete(isbn string) error
+	Close() error
 }
 
 func NewObjectStore(lg *slog.Logger, config storeconfig.ObjectConfig) (ObjectStore, error) {

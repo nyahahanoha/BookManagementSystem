@@ -25,6 +25,10 @@ func NewFileStore(lg *slog.Logger, config storeconfig.FileConfig) (*FileStore, e
 	}, nil
 }
 
+func (s *FileStore) Close() error {
+	return nil
+}
+
 func (s *FileStore) Put(url url.URL, isbn string) error {
 	resp, err := http.Get(url.String())
 	if err != nil {

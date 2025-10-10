@@ -4,18 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/http"
-	"net/url"
-	"strings"
-	"time"
 
-	"github.com/ant0ine/go-json-rest/rest"
+	"connectrpc.com/connect"
+	book_management_systemv1 "github.com/nyahahanoha/BookManagementSystem/backend/api/book_management_system/v1"
 	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/books"
 	bookscommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/common"
 	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/config"
-	servicecommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/service/common"
 	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/store"
-	storecommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/store/common"
 )
 
 type BooksService struct {
@@ -23,9 +18,6 @@ type BooksService struct {
 
 	books []books.Books
 	store store.BookStore
-	api   *http.Server
-
-	token string
 }
 
 func NewBooksService(lg *slog.Logger, config config.Config) (*BooksService, error) {
@@ -43,91 +35,46 @@ func NewBooksService(lg *slog.Logger, config config.Config) (*BooksService, erro
 		lg:    lg.With(slog.String("Package", "service")),
 		books: books,
 		store: *store,
-		api: &http.Server{
-			Addr: config.Address,
-		},
-		token: config.Token,
 	}, nil
 }
 
-func (s *BooksService) Listen() error {
-	api := rest.NewApi()
-	api.Use(CORSMiddleware())
-	api.Use(rest.DefaultDevStack...)
-	router, err := rest.MakeRouter(
-		rest.Get("/books", s.GetAllBooks),
-		rest.Get("/book:isbn", s.GetBook),
-		rest.Get("/books/search:title", s.SearchBook),
-		rest.Post("/put:isbn", s.Put),
-		rest.Delete("/book:isbn", s.Delete),
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create router: %w", err)
-	}
-	api.SetApp(router)
-	s.api.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/images/") {
-			filePath := "/var/lib/booksystem" + r.URL.Path[len("/images"):]
-			http.ServeFile(w, r, filePath)
-			return
+func (s *BooksService) Close() error {
+	for _, b := range s.books {
+		if err := b.Close(); err != nil {
+			s.lg.Warn("failed to close books", slog.String("err", err.Error()))
 		}
-		api.MakeHandler().ServeHTTP(w, r)
-	})
-	s.lg.Info("Start Listen Service", slog.String("address", s.api.Addr))
-	if err := s.api.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("failed to serve: %w", err)
 	}
-
-	s.lg.Info("Close Listen Service")
+	if err := s.store.Close(); err != nil {
+		s.lg.Warn("failed to close store", slog.String("err", err.Error()))
+		return fmt.Errorf("failed to close store: %w", err)
+	}
 	return nil
 }
 
-func (s *BooksService) Shutdown() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := s.api.Shutdown(ctx); err != nil {
-		s.lg.Error("failed to shutdown api", slog.String("err", err.Error()))
-		return fmt.Errorf("failed to shutdown api: %w", err)
-	}
-	s.lg.Info("Shutdown BooksService")
-	return nil
-}
-
-func CORSMiddleware() rest.Middleware {
-	return rest.MiddlewareSimple(func(handler rest.HandlerFunc) rest.HandlerFunc {
-		return func(w rest.ResponseWriter, r *rest.Request) {
-			// CORS headers
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-			// Handle preflight requests
-			if r.Method == "OPTIONS" {
-				w.WriteHeader(http.StatusOK)
-				return
+func NewAuthorizationInterceptor(token string, lg *slog.Logger) connect.UnaryInterceptorFunc {
+	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
+		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			authHeader := req.Header().Get("Authorization")
+			if authHeader != token {
+				lg.Warn("unauthorized access attempt", slog.String("authHeader", authHeader))
+				return nil, fmt.Errorf("unauthorized")
 			}
-
-			handler(w, r)
+			return next(ctx, req)
 		}
-	})
-}
-
-func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
-	if err := s.Authorization(r); err != nil {
-		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
 	}
 
-	isbn := strings.ReplaceAll(r.PathParam("isbn"), ":", "")
+	return connect.UnaryInterceptorFunc(interceptor)
+}
 
+func (s *BooksService) PutBook(ctx context.Context, req *connect.Request[book_management_systemv1.PutBookRequest]) (*connect.Response[book_management_systemv1.PutBookResponse], error) {
 	var info *bookscommon.Info
-	info, err := s.books[0].GetInfo(isbn)
+	info, err := s.books[0].GetInfo(req.Msg.Isbn)
 	if err != nil {
 		s.lg.Error("failed to get info", slog.String("err", err.Error()))
 	}
 
 	for _, b := range s.books[1:] {
-		moreInfo, err := b.GetInfo(isbn)
+		moreInfo, err := b.GetInfo(req.Msg.Isbn)
 		if err != nil {
 			s.lg.Warn("failed to get info from another source", slog.String("err", err.Error()))
 			continue
@@ -155,118 +102,92 @@ func (s *BooksService) Put(w rest.ResponseWriter, r *rest.Request) {
 		}
 	}
 	if info.Title == "" {
-		info.Title = isbn
+		info.Title = req.Msg.Isbn
 	}
 	s.lg.Info("Get book info", slog.String("title", info.Title), slog.String("isbn", info.ISBN))
 	if err := s.store.Put(*info); err != nil {
 		s.lg.Error("failed to put info in store", slog.String("err", err.Error()))
-		return
+		return nil, fmt.Errorf("failed to put info in store: %w", err)
 	}
-	w.WriteHeader(http.StatusNoContent)
+	return connect.NewResponse(&book_management_systemv1.PutBookResponse{}), nil
 }
 
-func (s *BooksService) Authorization(r *rest.Request) error {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader != s.token {
-		s.lg.Error("unauthorized access attempt", slog.String("provided", authHeader))
-		return fmt.Errorf("unauthorized")
+func convertInfoToProtobuf(info bookscommon.Info) *book_management_systemv1.Book {
+	var language book_management_systemv1.Language
+	switch info.Language {
+	case bookscommon.JP:
+		language = book_management_systemv1.Language_JAPANESE
+	case bookscommon.EN:
+		language = book_management_systemv1.Language_ENGLISH
+	default:
+		language = book_management_systemv1.Language_UNKNOWN
 	}
-	return nil
+	return &book_management_systemv1.Book{
+		Isbn:        info.ISBN,
+		Title:       info.Title,
+		Authors:     info.Authors,
+		Description: info.Description,
+		Publishdate: info.Publishdate.Format("2006-01"),
+		Language:    language,
+		Imageurl:    info.Image.Source.String(),
+	}
 }
 
-func (s *BooksService) GetBook(w rest.ResponseWriter, r *rest.Request) {
-	if err := s.Authorization(r); err != nil {
-		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-	isbn := strings.ReplaceAll(r.PathParam("isbn"), ":", "")
-
-	info, err := s.store.Get(isbn)
-	if err == storecommon.ErrNotFoundBook {
-		if err := w.WriteJson(servicecommon.BooksResponse{
-			Books: nil,
-			Count: 0,
-		}); err != nil {
-			s.lg.Error("internal server error", slog.String("err", err.Error()))
-			rest.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-		return
-	} else if err != nil {
+func (s *BooksService) GetBook(ctx context.Context, req *connect.Request[book_management_systemv1.GetBookRequest]) (*connect.Response[book_management_systemv1.GetBookResponse], error) {
+	info, err := s.store.Get(req.Msg.Isbn)
+	if err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
-		rest.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to get book in store: %w", err)
 	}
-	if err := w.WriteJson(servicecommon.BooksResponse{
-		Books: []bookscommon.Info{info},
-		Count: 1,
-	}); err != nil {
-		s.lg.Error("internal server error", slog.String("err", err.Error()))
-		rest.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
+
+	return connect.NewResponse(&book_management_systemv1.GetBookResponse{
+		Book: convertInfoToProtobuf(info),
+	}), nil
 }
 
-func (s *BooksService) GetAllBooks(w rest.ResponseWriter, r *rest.Request) {
-	if err := s.Authorization(r); err != nil {
-		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
+func (s *BooksService) GetAllBooks(ctx context.Context, req *connect.Request[book_management_systemv1.GetAllBooksRequest]) (*connect.Response[book_management_systemv1.GetAllBooksResponse], error) {
 	books, err := s.store.GetAll()
 	if err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
-		rest.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to get all books in store: %w", err)
 	}
-	if err := w.WriteJson(servicecommon.BooksResponse{
-		Books: books,
-		Count: len(books),
-	}); err != nil {
-		s.lg.Error("internal server error", slog.String("err", err.Error()))
-		rest.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
+
+	return connect.NewResponse(&book_management_systemv1.GetAllBooksResponse{
+		Books: func() []*book_management_systemv1.Book {
+			res := make([]*book_management_systemv1.Book, 0, len(books))
+			for _, info := range books {
+				res = append(res, convertInfoToProtobuf(info))
+			}
+			return res
+		}(),
+	}), nil
 }
 
-func (s *BooksService) SearchBook(w rest.ResponseWriter, r *rest.Request) {
-	if err := s.Authorization(r); err != nil {
-		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-	rawTitle := r.PathParam("title")
-	decodedTitle, err := url.PathUnescape(rawTitle)
-	if err != nil {
-		decodedTitle = rawTitle
-	}
-	title := strings.ReplaceAll(decodedTitle, ":", "")
-
-	books, err := s.store.Search(title)
+func (s *BooksService) SearchBook(ctx context.Context, req *connect.Request[book_management_systemv1.SearchBookRequest]) (*connect.Response[book_management_systemv1.SearchBookResponse], error) {
+	books, err := s.store.Search(req.Msg.Title)
 	if err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
-		rest.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to search books in store: %w", err)
 	}
-	if err := w.WriteJson(servicecommon.BooksResponse{
-		Books: books,
-		Count: len(books),
-	}); err != nil {
-		s.lg.Error("internal server error", slog.String("err", err.Error()))
-		rest.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
+	return connect.NewResponse(&book_management_systemv1.SearchBookResponse{
+		Books: func() []*book_management_systemv1.Book {
+			res := make([]*book_management_systemv1.Book, 0, len(books))
+			for _, info := range books {
+				res = append(res, convertInfoToProtobuf(info))
+			}
+			return res
+		}(),
+	}), nil
 }
 
-func (s *BooksService) Delete(w rest.ResponseWriter, r *rest.Request) {
-	if err := s.Authorization(r); err != nil {
-		rest.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-	isbn := strings.ReplaceAll(r.PathParam("isbn"), ":", "")
-
-	if err := s.store.Del(isbn); err != nil {
+func (s *BooksService) DeleteBook(ctx context.Context, req *connect.Request[book_management_systemv1.DeleteBookRequest]) (*connect.Response[book_management_systemv1.DeleteBookResponse], error) {
+	if err := s.store.Del(req.Msg.Isbn); err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
-		rest.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to delete book in store: %w", err)
 	}
-	w.WriteHeader(http.StatusNoContent)
+	return connect.NewResponse(&book_management_systemv1.DeleteBookResponse{}), nil
+}
+
+func (s *BooksService) RenameBook(ctx context.Context, req *connect.Request[book_management_systemv1.RenameBookRequest]) (*connect.Response[book_management_systemv1.RenameBookResponse], error) {
+	return nil, nil
 }

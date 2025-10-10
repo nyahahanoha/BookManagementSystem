@@ -4,6 +4,9 @@ package book_management_system.v1;
 
 service BookManagementService {
   rpc PutBook(PutBookRequest) returns (PutBookResponse);
+  rpc GetBook(GetBookRequest) returns (GetBookResponse);
+  rpc GetAllBooks(GetAllBooksRequest) returns (GetAllBooksResponse);
+  rpc SearchBook(SearchBookRequest) returns (SearchBookResponse);
   rpc RenameBook(RenameBookRequest) returns (RenameBookResponse);
   rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
 }
@@ -12,6 +15,42 @@ message PutBookRequest {
   string isbn = 1;
 }
 message PutBookResponse {
+}
+
+message GetBookRequest {
+  string isbn = 1;
+}
+message GetBookResponse {
+  Book book = 1;
+}
+
+message GetAllBooksRequest {
+}
+message GetAllBooksResponse {
+  repeated Book books = 1;
+}
+
+message SearchBookRequest {
+  string title = 1;
+}
+message SearchBookResponse {
+  repeated Book books = 1;
+}
+
+message Book {
+  string isbn = 1;
+  string title = 2;
+  repeated string authors = 3;
+  string description = 4;
+  string publishdate = 5;
+  Language language = 6;
+  string imageurl = 7;
+} 
+
+enum Language {
+  UNKNOWN = 0;
+  ENGLISH = 1;
+  JAPANESE = 2;
 }
 
 message RenameBookRequest {

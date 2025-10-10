@@ -21,6 +21,55 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Language int32
+
+const (
+	Language_UNKNOWN  Language = 0
+	Language_ENGLISH  Language = 1
+	Language_JAPANESE Language = 2
+)
+
+// Enum value maps for Language.
+var (
+	Language_name = map[int32]string{
+		0: "UNKNOWN",
+		1: "ENGLISH",
+		2: "JAPANESE",
+	}
+	Language_value = map[string]int32{
+		"UNKNOWN":  0,
+		"ENGLISH":  1,
+		"JAPANESE": 2,
+	}
+)
+
+func (x Language) Enum() *Language {
+	p := new(Language)
+	*p = x
+	return p
+}
+
+func (x Language) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Language) Descriptor() protoreflect.EnumDescriptor {
+	return file_book_management_system_v1_book_proto_enumTypes[0].Descriptor()
+}
+
+func (Language) Type() protoreflect.EnumType {
+	return &file_book_management_system_v1_book_proto_enumTypes[0]
+}
+
+func (x Language) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Language.Descriptor instead.
+func (Language) EnumDescriptor() ([]byte, []int) {
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{0}
+}
+
 type PutBookRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Isbn          string                 `protobuf:"bytes,1,opt,name=isbn,proto3" json:"isbn,omitempty"`
@@ -101,6 +150,354 @@ func (*PutBookResponse) Descriptor() ([]byte, []int) {
 	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{1}
 }
 
+type GetBookRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Isbn          string                 `protobuf:"bytes,1,opt,name=isbn,proto3" json:"isbn,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBookRequest) Reset() {
+	*x = GetBookRequest{}
+	mi := &file_book_management_system_v1_book_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBookRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBookRequest) ProtoMessage() {}
+
+func (x *GetBookRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_book_management_system_v1_book_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBookRequest.ProtoReflect.Descriptor instead.
+func (*GetBookRequest) Descriptor() ([]byte, []int) {
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetBookRequest) GetIsbn() string {
+	if x != nil {
+		return x.Isbn
+	}
+	return ""
+}
+
+type GetBookResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Book          *Book                  `protobuf:"bytes,1,opt,name=book,proto3" json:"book,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBookResponse) Reset() {
+	*x = GetBookResponse{}
+	mi := &file_book_management_system_v1_book_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBookResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBookResponse) ProtoMessage() {}
+
+func (x *GetBookResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_book_management_system_v1_book_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBookResponse.ProtoReflect.Descriptor instead.
+func (*GetBookResponse) Descriptor() ([]byte, []int) {
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetBookResponse) GetBook() *Book {
+	if x != nil {
+		return x.Book
+	}
+	return nil
+}
+
+type GetAllBooksRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllBooksRequest) Reset() {
+	*x = GetAllBooksRequest{}
+	mi := &file_book_management_system_v1_book_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllBooksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllBooksRequest) ProtoMessage() {}
+
+func (x *GetAllBooksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_book_management_system_v1_book_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllBooksRequest.ProtoReflect.Descriptor instead.
+func (*GetAllBooksRequest) Descriptor() ([]byte, []int) {
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{4}
+}
+
+type GetAllBooksResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Books         []*Book                `protobuf:"bytes,1,rep,name=books,proto3" json:"books,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllBooksResponse) Reset() {
+	*x = GetAllBooksResponse{}
+	mi := &file_book_management_system_v1_book_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllBooksResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllBooksResponse) ProtoMessage() {}
+
+func (x *GetAllBooksResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_book_management_system_v1_book_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllBooksResponse.ProtoReflect.Descriptor instead.
+func (*GetAllBooksResponse) Descriptor() ([]byte, []int) {
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetAllBooksResponse) GetBooks() []*Book {
+	if x != nil {
+		return x.Books
+	}
+	return nil
+}
+
+type SearchBookRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchBookRequest) Reset() {
+	*x = SearchBookRequest{}
+	mi := &file_book_management_system_v1_book_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchBookRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchBookRequest) ProtoMessage() {}
+
+func (x *SearchBookRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_book_management_system_v1_book_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchBookRequest.ProtoReflect.Descriptor instead.
+func (*SearchBookRequest) Descriptor() ([]byte, []int) {
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *SearchBookRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+type SearchBookResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Books         []*Book                `protobuf:"bytes,1,rep,name=books,proto3" json:"books,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchBookResponse) Reset() {
+	*x = SearchBookResponse{}
+	mi := &file_book_management_system_v1_book_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchBookResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchBookResponse) ProtoMessage() {}
+
+func (x *SearchBookResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_book_management_system_v1_book_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchBookResponse.ProtoReflect.Descriptor instead.
+func (*SearchBookResponse) Descriptor() ([]byte, []int) {
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SearchBookResponse) GetBooks() []*Book {
+	if x != nil {
+		return x.Books
+	}
+	return nil
+}
+
+type Book struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Isbn          string                 `protobuf:"bytes,1,opt,name=isbn,proto3" json:"isbn,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Authors       []string               `protobuf:"bytes,3,rep,name=authors,proto3" json:"authors,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Publishdate   string                 `protobuf:"bytes,5,opt,name=publishdate,proto3" json:"publishdate,omitempty"`
+	Language      Language               `protobuf:"varint,6,opt,name=language,proto3,enum=book_management_system.v1.Language" json:"language,omitempty"`
+	Imageurl      string                 `protobuf:"bytes,7,opt,name=imageurl,proto3" json:"imageurl,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Book) Reset() {
+	*x = Book{}
+	mi := &file_book_management_system_v1_book_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Book) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Book) ProtoMessage() {}
+
+func (x *Book) ProtoReflect() protoreflect.Message {
+	mi := &file_book_management_system_v1_book_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Book.ProtoReflect.Descriptor instead.
+func (*Book) Descriptor() ([]byte, []int) {
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *Book) GetIsbn() string {
+	if x != nil {
+		return x.Isbn
+	}
+	return ""
+}
+
+func (x *Book) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *Book) GetAuthors() []string {
+	if x != nil {
+		return x.Authors
+	}
+	return nil
+}
+
+func (x *Book) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Book) GetPublishdate() string {
+	if x != nil {
+		return x.Publishdate
+	}
+	return ""
+}
+
+func (x *Book) GetLanguage() Language {
+	if x != nil {
+		return x.Language
+	}
+	return Language_UNKNOWN
+}
+
+func (x *Book) GetImageurl() string {
+	if x != nil {
+		return x.Imageurl
+	}
+	return ""
+}
+
 type RenameBookRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Isbn          string                 `protobuf:"bytes,1,opt,name=isbn,proto3" json:"isbn,omitempty"`
@@ -111,7 +508,7 @@ type RenameBookRequest struct {
 
 func (x *RenameBookRequest) Reset() {
 	*x = RenameBookRequest{}
-	mi := &file_book_management_system_v1_book_proto_msgTypes[2]
+	mi := &file_book_management_system_v1_book_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -123,7 +520,7 @@ func (x *RenameBookRequest) String() string {
 func (*RenameBookRequest) ProtoMessage() {}
 
 func (x *RenameBookRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_book_management_system_v1_book_proto_msgTypes[2]
+	mi := &file_book_management_system_v1_book_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -136,7 +533,7 @@ func (x *RenameBookRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RenameBookRequest.ProtoReflect.Descriptor instead.
 func (*RenameBookRequest) Descriptor() ([]byte, []int) {
-	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{2}
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *RenameBookRequest) GetIsbn() string {
@@ -161,7 +558,7 @@ type RenameBookResponse struct {
 
 func (x *RenameBookResponse) Reset() {
 	*x = RenameBookResponse{}
-	mi := &file_book_management_system_v1_book_proto_msgTypes[3]
+	mi := &file_book_management_system_v1_book_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -173,7 +570,7 @@ func (x *RenameBookResponse) String() string {
 func (*RenameBookResponse) ProtoMessage() {}
 
 func (x *RenameBookResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_book_management_system_v1_book_proto_msgTypes[3]
+	mi := &file_book_management_system_v1_book_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -186,7 +583,7 @@ func (x *RenameBookResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RenameBookResponse.ProtoReflect.Descriptor instead.
 func (*RenameBookResponse) Descriptor() ([]byte, []int) {
-	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{3}
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{10}
 }
 
 type DeleteBookRequest struct {
@@ -198,7 +595,7 @@ type DeleteBookRequest struct {
 
 func (x *DeleteBookRequest) Reset() {
 	*x = DeleteBookRequest{}
-	mi := &file_book_management_system_v1_book_proto_msgTypes[4]
+	mi := &file_book_management_system_v1_book_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -210,7 +607,7 @@ func (x *DeleteBookRequest) String() string {
 func (*DeleteBookRequest) ProtoMessage() {}
 
 func (x *DeleteBookRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_book_management_system_v1_book_proto_msgTypes[4]
+	mi := &file_book_management_system_v1_book_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -223,7 +620,7 @@ func (x *DeleteBookRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteBookRequest.ProtoReflect.Descriptor instead.
 func (*DeleteBookRequest) Descriptor() ([]byte, []int) {
-	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{4}
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *DeleteBookRequest) GetIsbn() string {
@@ -241,7 +638,7 @@ type DeleteBookResponse struct {
 
 func (x *DeleteBookResponse) Reset() {
 	*x = DeleteBookResponse{}
-	mi := &file_book_management_system_v1_book_proto_msgTypes[5]
+	mi := &file_book_management_system_v1_book_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -253,7 +650,7 @@ func (x *DeleteBookResponse) String() string {
 func (*DeleteBookResponse) ProtoMessage() {}
 
 func (x *DeleteBookResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_book_management_system_v1_book_proto_msgTypes[5]
+	mi := &file_book_management_system_v1_book_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -266,7 +663,7 @@ func (x *DeleteBookResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteBookResponse.ProtoReflect.Descriptor instead.
 func (*DeleteBookResponse) Descriptor() ([]byte, []int) {
-	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{5}
+	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{12}
 }
 
 var File_book_management_system_v1_book_proto protoreflect.FileDescriptor
@@ -276,16 +673,43 @@ const file_book_management_system_v1_book_proto_rawDesc = "" +
 	"$book_management_system/v1/book.proto\x12\x19book_management_system.v1\"$\n" +
 	"\x0ePutBookRequest\x12\x12\n" +
 	"\x04isbn\x18\x01 \x01(\tR\x04isbn\"\x11\n" +
-	"\x0fPutBookResponse\"=\n" +
+	"\x0fPutBookResponse\"$\n" +
+	"\x0eGetBookRequest\x12\x12\n" +
+	"\x04isbn\x18\x01 \x01(\tR\x04isbn\"F\n" +
+	"\x0fGetBookResponse\x123\n" +
+	"\x04book\x18\x01 \x01(\v2\x1f.book_management_system.v1.BookR\x04book\"\x14\n" +
+	"\x12GetAllBooksRequest\"L\n" +
+	"\x13GetAllBooksResponse\x125\n" +
+	"\x05books\x18\x01 \x03(\v2\x1f.book_management_system.v1.BookR\x05books\")\n" +
+	"\x11SearchBookRequest\x12\x14\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\"K\n" +
+	"\x12SearchBookResponse\x125\n" +
+	"\x05books\x18\x01 \x03(\v2\x1f.book_management_system.v1.BookR\x05books\"\xeb\x01\n" +
+	"\x04Book\x12\x12\n" +
+	"\x04isbn\x18\x01 \x01(\tR\x04isbn\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x18\n" +
+	"\aauthors\x18\x03 \x03(\tR\aauthors\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12 \n" +
+	"\vpublishdate\x18\x05 \x01(\tR\vpublishdate\x12?\n" +
+	"\blanguage\x18\x06 \x01(\x0e2#.book_management_system.v1.LanguageR\blanguage\x12\x1a\n" +
+	"\bimageurl\x18\a \x01(\tR\bimageurl\"=\n" +
 	"\x11RenameBookRequest\x12\x12\n" +
 	"\x04isbn\x18\x01 \x01(\tR\x04isbn\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\"\x14\n" +
 	"\x12RenameBookResponse\"'\n" +
 	"\x11DeleteBookRequest\x12\x12\n" +
 	"\x04isbn\x18\x01 \x01(\tR\x04isbn\"\x14\n" +
-	"\x12DeleteBookResponse2\xcf\x02\n" +
+	"\x12DeleteBookResponse*2\n" +
+	"\bLanguage\x12\v\n" +
+	"\aUNKNOWN\x10\x00\x12\v\n" +
+	"\aENGLISH\x10\x01\x12\f\n" +
+	"\bJAPANESE\x10\x022\x8a\x05\n" +
 	"\x15BookManagementService\x12`\n" +
-	"\aPutBook\x12).book_management_system.v1.PutBookRequest\x1a*.book_management_system.v1.PutBookResponse\x12i\n" +
+	"\aPutBook\x12).book_management_system.v1.PutBookRequest\x1a*.book_management_system.v1.PutBookResponse\x12`\n" +
+	"\aGetBook\x12).book_management_system.v1.GetBookRequest\x1a*.book_management_system.v1.GetBookResponse\x12l\n" +
+	"\vGetAllBooks\x12-.book_management_system.v1.GetAllBooksRequest\x1a..book_management_system.v1.GetAllBooksResponse\x12i\n" +
+	"\n" +
+	"SearchBook\x12,.book_management_system.v1.SearchBookRequest\x1a-.book_management_system.v1.SearchBookResponse\x12i\n" +
 	"\n" +
 	"RenameBook\x12,.book_management_system.v1.RenameBookRequest\x1a-.book_management_system.v1.RenameBookResponse\x12i\n" +
 	"\n" +
@@ -304,27 +728,46 @@ func file_book_management_system_v1_book_proto_rawDescGZIP() []byte {
 	return file_book_management_system_v1_book_proto_rawDescData
 }
 
-var file_book_management_system_v1_book_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_book_management_system_v1_book_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_book_management_system_v1_book_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_book_management_system_v1_book_proto_goTypes = []any{
-	(*PutBookRequest)(nil),     // 0: book_management_system.v1.PutBookRequest
-	(*PutBookResponse)(nil),    // 1: book_management_system.v1.PutBookResponse
-	(*RenameBookRequest)(nil),  // 2: book_management_system.v1.RenameBookRequest
-	(*RenameBookResponse)(nil), // 3: book_management_system.v1.RenameBookResponse
-	(*DeleteBookRequest)(nil),  // 4: book_management_system.v1.DeleteBookRequest
-	(*DeleteBookResponse)(nil), // 5: book_management_system.v1.DeleteBookResponse
+	(Language)(0),               // 0: book_management_system.v1.Language
+	(*PutBookRequest)(nil),      // 1: book_management_system.v1.PutBookRequest
+	(*PutBookResponse)(nil),     // 2: book_management_system.v1.PutBookResponse
+	(*GetBookRequest)(nil),      // 3: book_management_system.v1.GetBookRequest
+	(*GetBookResponse)(nil),     // 4: book_management_system.v1.GetBookResponse
+	(*GetAllBooksRequest)(nil),  // 5: book_management_system.v1.GetAllBooksRequest
+	(*GetAllBooksResponse)(nil), // 6: book_management_system.v1.GetAllBooksResponse
+	(*SearchBookRequest)(nil),   // 7: book_management_system.v1.SearchBookRequest
+	(*SearchBookResponse)(nil),  // 8: book_management_system.v1.SearchBookResponse
+	(*Book)(nil),                // 9: book_management_system.v1.Book
+	(*RenameBookRequest)(nil),   // 10: book_management_system.v1.RenameBookRequest
+	(*RenameBookResponse)(nil),  // 11: book_management_system.v1.RenameBookResponse
+	(*DeleteBookRequest)(nil),   // 12: book_management_system.v1.DeleteBookRequest
+	(*DeleteBookResponse)(nil),  // 13: book_management_system.v1.DeleteBookResponse
 }
 var file_book_management_system_v1_book_proto_depIdxs = []int32{
-	0, // 0: book_management_system.v1.BookManagementService.PutBook:input_type -> book_management_system.v1.PutBookRequest
-	2, // 1: book_management_system.v1.BookManagementService.RenameBook:input_type -> book_management_system.v1.RenameBookRequest
-	4, // 2: book_management_system.v1.BookManagementService.DeleteBook:input_type -> book_management_system.v1.DeleteBookRequest
-	1, // 3: book_management_system.v1.BookManagementService.PutBook:output_type -> book_management_system.v1.PutBookResponse
-	3, // 4: book_management_system.v1.BookManagementService.RenameBook:output_type -> book_management_system.v1.RenameBookResponse
-	5, // 5: book_management_system.v1.BookManagementService.DeleteBook:output_type -> book_management_system.v1.DeleteBookResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	9,  // 0: book_management_system.v1.GetBookResponse.book:type_name -> book_management_system.v1.Book
+	9,  // 1: book_management_system.v1.GetAllBooksResponse.books:type_name -> book_management_system.v1.Book
+	9,  // 2: book_management_system.v1.SearchBookResponse.books:type_name -> book_management_system.v1.Book
+	0,  // 3: book_management_system.v1.Book.language:type_name -> book_management_system.v1.Language
+	1,  // 4: book_management_system.v1.BookManagementService.PutBook:input_type -> book_management_system.v1.PutBookRequest
+	3,  // 5: book_management_system.v1.BookManagementService.GetBook:input_type -> book_management_system.v1.GetBookRequest
+	5,  // 6: book_management_system.v1.BookManagementService.GetAllBooks:input_type -> book_management_system.v1.GetAllBooksRequest
+	7,  // 7: book_management_system.v1.BookManagementService.SearchBook:input_type -> book_management_system.v1.SearchBookRequest
+	10, // 8: book_management_system.v1.BookManagementService.RenameBook:input_type -> book_management_system.v1.RenameBookRequest
+	12, // 9: book_management_system.v1.BookManagementService.DeleteBook:input_type -> book_management_system.v1.DeleteBookRequest
+	2,  // 10: book_management_system.v1.BookManagementService.PutBook:output_type -> book_management_system.v1.PutBookResponse
+	4,  // 11: book_management_system.v1.BookManagementService.GetBook:output_type -> book_management_system.v1.GetBookResponse
+	6,  // 12: book_management_system.v1.BookManagementService.GetAllBooks:output_type -> book_management_system.v1.GetAllBooksResponse
+	8,  // 13: book_management_system.v1.BookManagementService.SearchBook:output_type -> book_management_system.v1.SearchBookResponse
+	11, // 14: book_management_system.v1.BookManagementService.RenameBook:output_type -> book_management_system.v1.RenameBookResponse
+	13, // 15: book_management_system.v1.BookManagementService.DeleteBook:output_type -> book_management_system.v1.DeleteBookResponse
+	10, // [10:16] is the sub-list for method output_type
+	4,  // [4:10] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_book_management_system_v1_book_proto_init() }
@@ -337,13 +780,14 @@ func file_book_management_system_v1_book_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_book_management_system_v1_book_proto_rawDesc), len(file_book_management_system_v1_book_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   6,
+			NumEnums:      1,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_book_management_system_v1_book_proto_goTypes,
 		DependencyIndexes: file_book_management_system_v1_book_proto_depIdxs,
+		EnumInfos:         file_book_management_system_v1_book_proto_enumTypes,
 		MessageInfos:      file_book_management_system_v1_book_proto_msgTypes,
 	}.Build()
 	File_book_management_system_v1_book_proto = out.File

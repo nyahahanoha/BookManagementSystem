@@ -36,6 +36,15 @@ const (
 	// BookManagementServicePutBookProcedure is the fully-qualified name of the BookManagementService's
 	// PutBook RPC.
 	BookManagementServicePutBookProcedure = "/book_management_system.v1.BookManagementService/PutBook"
+	// BookManagementServiceGetBookProcedure is the fully-qualified name of the BookManagementService's
+	// GetBook RPC.
+	BookManagementServiceGetBookProcedure = "/book_management_system.v1.BookManagementService/GetBook"
+	// BookManagementServiceGetAllBooksProcedure is the fully-qualified name of the
+	// BookManagementService's GetAllBooks RPC.
+	BookManagementServiceGetAllBooksProcedure = "/book_management_system.v1.BookManagementService/GetAllBooks"
+	// BookManagementServiceSearchBookProcedure is the fully-qualified name of the
+	// BookManagementService's SearchBook RPC.
+	BookManagementServiceSearchBookProcedure = "/book_management_system.v1.BookManagementService/SearchBook"
 	// BookManagementServiceRenameBookProcedure is the fully-qualified name of the
 	// BookManagementService's RenameBook RPC.
 	BookManagementServiceRenameBookProcedure = "/book_management_system.v1.BookManagementService/RenameBook"
@@ -48,6 +57,9 @@ const (
 // service.
 type BookManagementServiceClient interface {
 	PutBook(context.Context, *connect.Request[v1.PutBookRequest]) (*connect.Response[v1.PutBookResponse], error)
+	GetBook(context.Context, *connect.Request[v1.GetBookRequest]) (*connect.Response[v1.GetBookResponse], error)
+	GetAllBooks(context.Context, *connect.Request[v1.GetAllBooksRequest]) (*connect.Response[v1.GetAllBooksResponse], error)
+	SearchBook(context.Context, *connect.Request[v1.SearchBookRequest]) (*connect.Response[v1.SearchBookResponse], error)
 	RenameBook(context.Context, *connect.Request[v1.RenameBookRequest]) (*connect.Response[v1.RenameBookResponse], error)
 	DeleteBook(context.Context, *connect.Request[v1.DeleteBookRequest]) (*connect.Response[v1.DeleteBookResponse], error)
 }
@@ -70,6 +82,24 @@ func NewBookManagementServiceClient(httpClient connect.HTTPClient, baseURL strin
 			connect.WithSchema(bookManagementServiceMethods.ByName("PutBook")),
 			connect.WithClientOptions(opts...),
 		),
+		getBook: connect.NewClient[v1.GetBookRequest, v1.GetBookResponse](
+			httpClient,
+			baseURL+BookManagementServiceGetBookProcedure,
+			connect.WithSchema(bookManagementServiceMethods.ByName("GetBook")),
+			connect.WithClientOptions(opts...),
+		),
+		getAllBooks: connect.NewClient[v1.GetAllBooksRequest, v1.GetAllBooksResponse](
+			httpClient,
+			baseURL+BookManagementServiceGetAllBooksProcedure,
+			connect.WithSchema(bookManagementServiceMethods.ByName("GetAllBooks")),
+			connect.WithClientOptions(opts...),
+		),
+		searchBook: connect.NewClient[v1.SearchBookRequest, v1.SearchBookResponse](
+			httpClient,
+			baseURL+BookManagementServiceSearchBookProcedure,
+			connect.WithSchema(bookManagementServiceMethods.ByName("SearchBook")),
+			connect.WithClientOptions(opts...),
+		),
 		renameBook: connect.NewClient[v1.RenameBookRequest, v1.RenameBookResponse](
 			httpClient,
 			baseURL+BookManagementServiceRenameBookProcedure,
@@ -87,14 +117,32 @@ func NewBookManagementServiceClient(httpClient connect.HTTPClient, baseURL strin
 
 // bookManagementServiceClient implements BookManagementServiceClient.
 type bookManagementServiceClient struct {
-	putBook    *connect.Client[v1.PutBookRequest, v1.PutBookResponse]
-	renameBook *connect.Client[v1.RenameBookRequest, v1.RenameBookResponse]
-	deleteBook *connect.Client[v1.DeleteBookRequest, v1.DeleteBookResponse]
+	putBook     *connect.Client[v1.PutBookRequest, v1.PutBookResponse]
+	getBook     *connect.Client[v1.GetBookRequest, v1.GetBookResponse]
+	getAllBooks *connect.Client[v1.GetAllBooksRequest, v1.GetAllBooksResponse]
+	searchBook  *connect.Client[v1.SearchBookRequest, v1.SearchBookResponse]
+	renameBook  *connect.Client[v1.RenameBookRequest, v1.RenameBookResponse]
+	deleteBook  *connect.Client[v1.DeleteBookRequest, v1.DeleteBookResponse]
 }
 
 // PutBook calls book_management_system.v1.BookManagementService.PutBook.
 func (c *bookManagementServiceClient) PutBook(ctx context.Context, req *connect.Request[v1.PutBookRequest]) (*connect.Response[v1.PutBookResponse], error) {
 	return c.putBook.CallUnary(ctx, req)
+}
+
+// GetBook calls book_management_system.v1.BookManagementService.GetBook.
+func (c *bookManagementServiceClient) GetBook(ctx context.Context, req *connect.Request[v1.GetBookRequest]) (*connect.Response[v1.GetBookResponse], error) {
+	return c.getBook.CallUnary(ctx, req)
+}
+
+// GetAllBooks calls book_management_system.v1.BookManagementService.GetAllBooks.
+func (c *bookManagementServiceClient) GetAllBooks(ctx context.Context, req *connect.Request[v1.GetAllBooksRequest]) (*connect.Response[v1.GetAllBooksResponse], error) {
+	return c.getAllBooks.CallUnary(ctx, req)
+}
+
+// SearchBook calls book_management_system.v1.BookManagementService.SearchBook.
+func (c *bookManagementServiceClient) SearchBook(ctx context.Context, req *connect.Request[v1.SearchBookRequest]) (*connect.Response[v1.SearchBookResponse], error) {
+	return c.searchBook.CallUnary(ctx, req)
 }
 
 // RenameBook calls book_management_system.v1.BookManagementService.RenameBook.
@@ -111,6 +159,9 @@ func (c *bookManagementServiceClient) DeleteBook(ctx context.Context, req *conne
 // book_management_system.v1.BookManagementService service.
 type BookManagementServiceHandler interface {
 	PutBook(context.Context, *connect.Request[v1.PutBookRequest]) (*connect.Response[v1.PutBookResponse], error)
+	GetBook(context.Context, *connect.Request[v1.GetBookRequest]) (*connect.Response[v1.GetBookResponse], error)
+	GetAllBooks(context.Context, *connect.Request[v1.GetAllBooksRequest]) (*connect.Response[v1.GetAllBooksResponse], error)
+	SearchBook(context.Context, *connect.Request[v1.SearchBookRequest]) (*connect.Response[v1.SearchBookResponse], error)
 	RenameBook(context.Context, *connect.Request[v1.RenameBookRequest]) (*connect.Response[v1.RenameBookResponse], error)
 	DeleteBook(context.Context, *connect.Request[v1.DeleteBookRequest]) (*connect.Response[v1.DeleteBookResponse], error)
 }
@@ -126,6 +177,24 @@ func NewBookManagementServiceHandler(svc BookManagementServiceHandler, opts ...c
 		BookManagementServicePutBookProcedure,
 		svc.PutBook,
 		connect.WithSchema(bookManagementServiceMethods.ByName("PutBook")),
+		connect.WithHandlerOptions(opts...),
+	)
+	bookManagementServiceGetBookHandler := connect.NewUnaryHandler(
+		BookManagementServiceGetBookProcedure,
+		svc.GetBook,
+		connect.WithSchema(bookManagementServiceMethods.ByName("GetBook")),
+		connect.WithHandlerOptions(opts...),
+	)
+	bookManagementServiceGetAllBooksHandler := connect.NewUnaryHandler(
+		BookManagementServiceGetAllBooksProcedure,
+		svc.GetAllBooks,
+		connect.WithSchema(bookManagementServiceMethods.ByName("GetAllBooks")),
+		connect.WithHandlerOptions(opts...),
+	)
+	bookManagementServiceSearchBookHandler := connect.NewUnaryHandler(
+		BookManagementServiceSearchBookProcedure,
+		svc.SearchBook,
+		connect.WithSchema(bookManagementServiceMethods.ByName("SearchBook")),
 		connect.WithHandlerOptions(opts...),
 	)
 	bookManagementServiceRenameBookHandler := connect.NewUnaryHandler(
@@ -144,6 +213,12 @@ func NewBookManagementServiceHandler(svc BookManagementServiceHandler, opts ...c
 		switch r.URL.Path {
 		case BookManagementServicePutBookProcedure:
 			bookManagementServicePutBookHandler.ServeHTTP(w, r)
+		case BookManagementServiceGetBookProcedure:
+			bookManagementServiceGetBookHandler.ServeHTTP(w, r)
+		case BookManagementServiceGetAllBooksProcedure:
+			bookManagementServiceGetAllBooksHandler.ServeHTTP(w, r)
+		case BookManagementServiceSearchBookProcedure:
+			bookManagementServiceSearchBookHandler.ServeHTTP(w, r)
 		case BookManagementServiceRenameBookProcedure:
 			bookManagementServiceRenameBookHandler.ServeHTTP(w, r)
 		case BookManagementServiceDeleteBookProcedure:
@@ -159,6 +234,18 @@ type UnimplementedBookManagementServiceHandler struct{}
 
 func (UnimplementedBookManagementServiceHandler) PutBook(context.Context, *connect.Request[v1.PutBookRequest]) (*connect.Response[v1.PutBookResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("book_management_system.v1.BookManagementService.PutBook is not implemented"))
+}
+
+func (UnimplementedBookManagementServiceHandler) GetBook(context.Context, *connect.Request[v1.GetBookRequest]) (*connect.Response[v1.GetBookResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("book_management_system.v1.BookManagementService.GetBook is not implemented"))
+}
+
+func (UnimplementedBookManagementServiceHandler) GetAllBooks(context.Context, *connect.Request[v1.GetAllBooksRequest]) (*connect.Response[v1.GetAllBooksResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("book_management_system.v1.BookManagementService.GetAllBooks is not implemented"))
+}
+
+func (UnimplementedBookManagementServiceHandler) SearchBook(context.Context, *connect.Request[v1.SearchBookRequest]) (*connect.Response[v1.SearchBookResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("book_management_system.v1.BookManagementService.SearchBook is not implemented"))
 }
 
 func (UnimplementedBookManagementServiceHandler) RenameBook(context.Context, *connect.Request[v1.RenameBookRequest]) (*connect.Response[v1.RenameBookResponse], error) {
