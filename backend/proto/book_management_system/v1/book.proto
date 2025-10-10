@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package book_management_system.v1;
+
+service BookManagementService {
+  rpc PutBook(PutBookRequest) returns (PutBookResponse);
+  rpc RenameBook(RenameBookRequest) returns (RenameBookResponse);
+  rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
+}
+
+message PutBookRequest {
+  string isbn = 1;
+}
+message PutBookResponse {
+}
+
+message RenameBookRequest {
+  string isbn = 1;
+  string title = 2;
+}
+message RenameBookResponse {
+}
+
+message DeleteBookRequest {
+  string isbn = 1;
+}
+message DeleteBookResponse {
+}
