@@ -1,0 +1,24 @@
+---
+version: 2
+
+run:
+  timeout: 5m
+  tests: false
+
+linters:
+  settings:
+    errcheck:
+      check-type-assertions: true
+      exclude-functions:
+        - (io.Closer).Close
+        - (*os.File).Close
+        - (*bytes.Buffer).Close
+        - (*gzip.Writer).Close
+    govet:
+    staticcheck:
+
+formatters:
+  settings:
+    gofmt:
+    goimports:
+      local-prefixes: github.com/nyahahanoha/BookManagementSystem

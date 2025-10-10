@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"time"
 
-	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
+	bookscommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/common"
 )
 
 // RSS構造体 (必要最小限)
@@ -76,7 +76,7 @@ func (s *NDL) GetInfo(isbn string) (*bookscommon.Info, error) {
 	}
 
 	if len(rss.Channel.Items) == 0 {
-		return nil, fmt.Errorf("No book found for ISBN: %s", isbn)
+		return nil, fmt.Errorf("no book found for ISBN: %s", isbn)
 	}
 
 	fmt.Printf("%+v\n", rss.Channel.Items[0])

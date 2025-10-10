@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
-	storeconfig "github.com/BookManagementSystem/backend/pkg/store/config"
-	"github.com/BookManagementSystem/backend/pkg/store/db/mysql"
+	bookscommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/common"
+	storeconfig "github.com/nyahahanoha/BookManagementSystem/backend/pkg/store/config"
+	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/store/db/mysql"
 )
 
 type DBStore interface {

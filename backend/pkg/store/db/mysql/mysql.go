@@ -8,10 +8,10 @@ import (
 	"net/url"
 	"time"
 
-	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
-	storecommon "github.com/BookManagementSystem/backend/pkg/store/common"
-	storeconfig "github.com/BookManagementSystem/backend/pkg/store/config"
 	_ "github.com/go-sql-driver/mysql"
+	bookscommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/common"
+	storecommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/store/common"
+	storeconfig "github.com/nyahahanoha/BookManagementSystem/backend/pkg/store/config"
 )
 
 type MySQL struct {

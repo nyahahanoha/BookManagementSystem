@@ -3,10 +3,10 @@ package books
 import (
 	"fmt"
 
-	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
-	booksconfig "github.com/BookManagementSystem/backend/pkg/books/config"
-	googlebooks "github.com/BookManagementSystem/backend/pkg/books/google"
-	ndlbooks "github.com/BookManagementSystem/backend/pkg/books/ndl"
+	bookscommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/common"
+	booksconfig "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/config"
+	googlebooks "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/google"
+	ndlbooks "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/ndl"
 )
 
 type Books interface {

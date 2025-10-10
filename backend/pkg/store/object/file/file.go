@@ -10,7 +10,7 @@ import (
 	"path"
 	"strings"
 
-	storeconfig "github.com/BookManagementSystem/backend/pkg/store/config"
+	storeconfig "github.com/nyahahanoha/BookManagementSystem/backend/pkg/store/config"
 )
 
 type FileStore struct {

@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/BookManagementSystem/backend/pkg/config"
-	"github.com/BookManagementSystem/backend/pkg/service"
+	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/config"
+	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/service"
 	"gopkg.in/yaml.v3"
 )
 

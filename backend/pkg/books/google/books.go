@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	bookscommon "github.com/BookManagementSystem/backend/pkg/books/common"
-	booksconfig "github.com/BookManagementSystem/backend/pkg/books/config"
+	bookscommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/common"
+	booksconfig "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/config"
 	api "google.golang.org/api/books/v1"
 	"google.golang.org/api/option"
 )
@@ -52,7 +52,7 @@ func (s *GoogleBooks) GetInfo(isbn string) (*bookscommon.Info, error) {
 		volumeFullTitle := volume.VolumeInfo.Title + " " + volume.VolumeInfo.Subtitle
 		itemFullTitle := item.VolumeInfo.Title + " " + item.VolumeInfo.Subtitle
 
-		if strings.Contains(volumeFullTitle, itemFullTitle) || strings.Contains(volumeFullTitle, itemFullTitle) {
+		if strings.Contains(volumeFullTitle, itemFullTitle) || strings.Contains(itemFullTitle, volumeFullTitle) {
 			if len(itemFullTitle) > len(volumeFullTitle) {
 				volume = item
 			}

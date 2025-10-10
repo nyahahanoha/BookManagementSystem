@@ -1,4 +1,4 @@
-module github.com/BookManagementSystem/backend
+module github.com/nyahahanoha/BookManagementSystem/backend
 
 go 1.24.4
 
