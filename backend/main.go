@@ -44,6 +44,10 @@ func main() {
 	mux.Handle(path, handler)
 
 	mux.HandleFunc("/images/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != cfg.Token {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		if strings.HasPrefix(r.URL.Path, "/images/") {
 			filePath := "/var/lib/booksystem" + r.URL.Path[len("/images"):]
 			http.ServeFile(w, r, filePath)
