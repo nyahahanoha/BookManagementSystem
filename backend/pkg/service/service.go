@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	book_management_systemv1 "github.com/nyahahanoha/BookManagementSystem/backend/api/book_management_system/v1"
+	book_management_systemv1 "github.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1"
 	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/books"
 	bookscommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/common"
 	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/config"

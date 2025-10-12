@@ -1,3 +1,4 @@
+---
 books:
   kind:
     - NDL
@@ -8,7 +9,7 @@ store:
   db:
     kind: MySQL
     mysql:
-      address: booksystem_db
+      address: localhost
       port: 3306
       user: ${MYSQL_USER}
       password: ${MYSQL_PASSWORD}
@@ -20,4 +21,3 @@ store:
 
 address: ":8080"
 token: ${BOOKS_API_TOKEN}
-

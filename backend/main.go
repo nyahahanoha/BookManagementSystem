@@ -10,7 +10,7 @@ import (
 	"syscall"
 
 	"connectrpc.com/connect"
-	"github.com/nyahahanoha/BookManagementSystem/backend/api/book_management_system/v1/book_management_systemv1connect"
+	"github.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1/book_management_systemv1connect"
 	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/config"
 	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/service"
 	"gopkg.in/yaml.v3"
