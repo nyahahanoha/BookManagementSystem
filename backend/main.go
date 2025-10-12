@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"connectrpc.com/connect"
@@ -41,6 +42,13 @@ func main() {
 		connect.WithInterceptors(service.NewAuthorizationInterceptor(cfg.Token, logger)),
 	)
 	mux.Handle(path, handler)
+
+	mux.HandleFunc("/images/", func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/images/") {
+			filePath := "/var/lib/booksystem" + r.URL.Path[len("/images"):]
+			http.ServeFile(w, r, filePath)
+		}
+	})
 
 	ctx, cancel := context.WithCancel(context.Background())
 	sigs := make(chan os.Signal, 1)
