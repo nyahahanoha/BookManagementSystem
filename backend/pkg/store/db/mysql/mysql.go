@@ -51,7 +51,8 @@ func (s *MySQL) Init() error {
 		publishdate date,
 		language varchar(8),
 		image varchar(200),
-		deleted boolean DEFAULT false
+		deleted boolean DEFAULT false,
+		updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	)`)
 	if err != nil {
 		return fmt.Errorf("failed to create table: %w", err)
@@ -153,7 +154,7 @@ func (s *MySQL) Get(isbn string) (bookscommon.Info, error) {
         publishdate,
         language,
         image
-        FROM books WHERE isbn = ? AND deleted = false`, isbn)
+        FROM books WHERE isbn = ? AND deleted = false ORDER BY updated_time DESC`, isbn)
 	if err != nil {
 		return bookscommon.Info{}, fmt.Errorf("failed to execute query: %w", err)
 	}
@@ -174,7 +175,7 @@ func (s *MySQL) GetAll() ([]bookscommon.Info, error) {
         description,
         publishdate,
         language,
-        image FROM books WHERE deleted = false`)
+        image FROM books WHERE deleted = false ORDER BY updated_time DESC`)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
@@ -195,7 +196,7 @@ func (s *MySQL) Search(title string) ([]bookscommon.Info, error) {
         publishdate,
         language,
         image
-				FROM books WHERE title LIKE ? AND deleted = false`, "%"+title+"%")
+				FROM books WHERE title LIKE ? AND deleted = false ORDER BY updated_time DESC`, "%"+title+"%")
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}

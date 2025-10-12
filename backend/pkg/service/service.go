@@ -194,5 +194,10 @@ func (s *BooksService) DeleteBook(ctx context.Context, req *connect.Request[book
 }
 
 func (s *BooksService) RenameBook(ctx context.Context, req *connect.Request[book_management_systemv1.RenameBookRequest]) (*connect.Response[book_management_systemv1.RenameBookResponse], error) {
-	return nil, nil
+	s.lg.Info("recieved request to Rename book", slog.String("isbn", req.Msg.Isbn), slog.String("title", req.Msg.Title))
+	if err := s.store.Rename(req.Msg.Isbn, req.Msg.Title); err != nil {
+		s.lg.Error("internal server error", slog.String("err", err.Error()))
+		return nil, fmt.Errorf("failed to rename book in store: %w", err)
+	}
+	return connect.NewResponse(&book_management_systemv1.RenameBookResponse{}), nil
 }

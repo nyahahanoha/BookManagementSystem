@@ -112,3 +112,10 @@ func (s *BookStore) Del(isbn string) error {
 	}
 	return nil
 }
+
+func (s *BookStore) Rename(isbn, title string) error {
+	if err := s.db.Rename(isbn, title); err != nil {
+		return fmt.Errorf("failed to rename info in db: %w", err)
+	}
+	return nil
+}
