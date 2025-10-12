@@ -12,6 +12,8 @@ import (
 )
 
 type BookStore struct {
+	lg *slog.Logger
+
 	db     db.DBStore
 	object object.ObjectStore
 }
@@ -31,6 +33,7 @@ func NewBooksStore(lg *slog.Logger, config storeconfig.Config) (*BookStore, erro
 	}
 
 	return &BookStore{
+		lg:     lg,
 		db:     db,
 		object: object,
 	}, nil

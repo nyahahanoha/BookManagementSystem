@@ -30,9 +30,12 @@ func (s *FileStore) Close() error {
 }
 
 func (s *FileStore) Put(url url.URL, isbn string) error {
+	if url.String() == "" {
+		return nil
+	}
 	resp, err := http.Get(url.String())
 	if err != nil {
-		return fmt.Errorf("failed to download image: %w", err)
+		return fmt.Errorf("failed to get image: %w", err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {

@@ -4,9 +4,7 @@ go 1.24.4
 
 require (
 	connectrpc.com/connect v1.19.1
-	github.com/ant0ine/go-json-rest v3.3.2+incompatible
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/nyahahanoha/BookManagementSystem/backend v0.0.0-00010101000000-000000000000
 	google.golang.org/api v0.249.0
 	google.golang.org/protobuf v1.36.9
 	gopkg.in/yaml.v3 v3.0.1
