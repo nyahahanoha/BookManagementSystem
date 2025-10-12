@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"log/slog"
@@ -9,6 +10,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	book_management_systemv1 "github.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1"
+	book_management_systemv1connect "github.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1/book_management_systemv1connect"
+
+	"connectrpc.com/connect"
 	"github.com/BookManagementSystem/scanner/mac/bluetooth"
 	"github.com/BookManagementSystem/scanner/mac/common"
 	"github.com/BookManagementSystem/scanner/mac/config"
@@ -75,18 +80,19 @@ func main() {
 		}
 	}()
 
+	client := book_management_systemv1connect.NewBookManagementServiceClient(
+		http.DefaultClient,
+		cfg.API,
+	)
+	ctx, cancel := context.WithCancel(context.Background())
+	ctx, callInfo := connect.NewClientContext(ctx)
+	callInfo.RequestHeader().Set("Authorization", cfg.Token)
 	for {
 		select {
 		case result := <-ch:
-			req, err := http.NewRequest("POST", cfg.API+"/put:"+result.ISBN, nil)
-			if err != nil {
-				logger.Error("failed to post request", slog.String("isbn", result.ISBN), slog.String("error", err.Error()))
-				continue
-			}
-			req.Header.Set("Authorization", cfg.Token)
-			client := &http.Client{}
-			_, err = client.Do(req)
-			if err != nil {
+			if _, err = client.PutBook(ctx, connect.NewRequest(&book_management_systemv1.PutBookRequest{
+				Isbn: result.ISBN,
+			})); err != nil {
 				logger.Error("failed to post request", slog.String("isbn", result.ISBN), slog.String("error", err.Error()))
 				continue
 			}
@@ -95,6 +101,7 @@ func main() {
 				log.Fatalf("failed to close scanner: %v", err)
 				return
 			}
+			cancel()
 			return
 		}
 	}
