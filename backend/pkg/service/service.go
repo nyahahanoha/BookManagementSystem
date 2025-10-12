@@ -67,6 +67,7 @@ func NewAuthorizationInterceptor(token string, lg *slog.Logger) connect.UnaryInt
 }
 
 func (s *BooksService) PutBook(ctx context.Context, req *connect.Request[book_management_systemv1.PutBookRequest]) (*connect.Response[book_management_systemv1.PutBookResponse], error) {
+	s.lg.Info("recieved request to Put book", slog.String("isbn", req.Msg.Isbn))
 	var info *bookscommon.Info
 	info, err := s.books[0].GetInfo(req.Msg.Isbn)
 	if err != nil {
@@ -134,6 +135,7 @@ func convertInfoToProtobuf(info bookscommon.Info) *book_management_systemv1.Book
 }
 
 func (s *BooksService) GetBook(ctx context.Context, req *connect.Request[book_management_systemv1.GetBookRequest]) (*connect.Response[book_management_systemv1.GetBookResponse], error) {
+	s.lg.Info("recieved request to Get book", slog.String("isbn", req.Msg.Isbn))
 	info, err := s.store.Get(req.Msg.Isbn)
 	if err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
@@ -146,6 +148,7 @@ func (s *BooksService) GetBook(ctx context.Context, req *connect.Request[book_ma
 }
 
 func (s *BooksService) GetAllBooks(ctx context.Context, req *connect.Request[book_management_systemv1.GetAllBooksRequest]) (*connect.Response[book_management_systemv1.GetAllBooksResponse], error) {
+	s.lg.Info("recieved request to Get all books")
 	books, err := s.store.GetAll()
 	if err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
@@ -164,6 +167,7 @@ func (s *BooksService) GetAllBooks(ctx context.Context, req *connect.Request[boo
 }
 
 func (s *BooksService) SearchBook(ctx context.Context, req *connect.Request[book_management_systemv1.SearchBookRequest]) (*connect.Response[book_management_systemv1.SearchBookResponse], error) {
+	s.lg.Info("recieved request to Search books", slog.String("title", req.Msg.Title))
 	books, err := s.store.Search(req.Msg.Title)
 	if err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
@@ -181,6 +185,7 @@ func (s *BooksService) SearchBook(ctx context.Context, req *connect.Request[book
 }
 
 func (s *BooksService) DeleteBook(ctx context.Context, req *connect.Request[book_management_systemv1.DeleteBookRequest]) (*connect.Response[book_management_systemv1.DeleteBookResponse], error) {
+	s.lg.Info("recieved request to Delete book", slog.String("isbn", req.Msg.Isbn))
 	if err := s.store.Del(req.Msg.Isbn); err != nil {
 		s.lg.Error("internal server error", slog.String("err", err.Error()))
 		return nil, fmt.Errorf("failed to delete book in store: %w", err)
