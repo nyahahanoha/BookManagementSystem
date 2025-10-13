@@ -39,15 +39,13 @@ func StringToDate(s string) (time.Time, error) {
 
 // ItemからBookInfoへ変換
 func ToBookInfo(item Item) bookscommon.Info {
-	fullTitle := item.Title + " " + item.Volume
-
 	date, err := StringToDate(item.PubDate)
 	if err != nil {
 		date = time.Time{}
 	}
 
 	return bookscommon.Info{
-		Title:       fullTitle,
+		Title:       item.Title,
 		Authors:     item.Authors,
 		Publishdate: date,
 	}
@@ -82,10 +80,9 @@ func (s *NDL) GetInfo(isbn string) (*bookscommon.Info, error) {
 
 	item := rss.Channel.Items[0]
 	info := ToBookInfo(item)
+	volume := item.Volume
 	for _, item := range rss.Channel.Items {
-		fullTitle := item.Title + " " + item.Volume
-
-		titles := append(strings.Fields(fullTitle), strings.Fields(info.Title)...)
+		titles := append(strings.Fields(item.Title), strings.Fields(info.Title)...)
 		seen := make(map[string]bool)
 		merged := []string{}
 		for _, title := range titles {
@@ -94,9 +91,13 @@ func (s *NDL) GetInfo(isbn string) (*bookscommon.Info, error) {
 				merged = append(merged, title)
 			}
 		}
-
 		info.Title = strings.Join(merged, " ")
+
+		if volume == "" {
+			volume = item.Volume
+		}
 	}
+	info.Title = info.Title + " " + volume
 
 	info.ISBN = isbn
 	info.Language = bookscommon.JP
