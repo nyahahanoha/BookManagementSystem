@@ -45,20 +45,32 @@ export default function BookCard({ book, apiBaseUrl, onDelete, onRequestDelete, 
     // for the user to retry or cancel.
   };
 
+  // YYYY-MM-DD or YYYY-MM or YYYY to YYYY-MM
+  const formatPublishDate = (dateStr: string) => {
+    if (!dateStr) return "";
+    const parts = dateStr.split('-');
+    if (parts.length >= 2) {
+      return `${parts[0]}-${parts[1]}`;
+    }
+    return parts[0];
+  };
+
   // バックエンドの画像URLを直接参照するように変更
   const imageUrl = book.imageurl
     ? `${apiBaseUrl}/images/${book.imageurl}` : null;
 
   return (
-    <div class="bookcard">
-      {imageUrl ? (
-        <img src={imageUrl} alt={`Cover of ${book.title}`} class="book-cover" />
-      ) : (
-        <div class="book-cover book-cover-placeholder">
-          <span>No Image</span>
-        </div>
-      )}
-      <div class="book-info">
+    <div class="bookcard-horizontal">
+      <div class="bookcard-horizontal-img">
+        {imageUrl ? (
+          <img src={imageUrl} alt={`Cover of ${book.title}`} class="bookcard-horizontal-img-el" />
+        ) : (
+          <div class="bookcard-img-placeholder">
+            <span>No Image</span>
+          </div>
+        )}
+      </div>
+      <div class="bookcard-horizontal-main">
         {isEditing ? (
           <div class="book-title-edit">
             <input
@@ -66,7 +78,7 @@ export default function BookCard({ book, apiBaseUrl, onDelete, onRequestDelete, 
               value={newTitle}
               onInput={(e) => setNewTitle((e.target as HTMLInputElement).value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRenameRequest()}
-              class="book-title-input"
+              class="searchform-blue-input" // 既存のスタイルを流用
             />
             <button onClick={handleRenameRequest} class="book-title-save">Save</button>
             <button
@@ -80,15 +92,23 @@ export default function BookCard({ book, apiBaseUrl, onDelete, onRequestDelete, 
             </button>
           </div>
         ) : (
-          <h3 class="book-title" onClick={() => onRequestRename && setIsEditing(true)}>
-            {book.title}
-          </h3>
+          <div class="bookcard-horizontal-header">
+            <h3 class="bookcard-horizontal-title" onClick={() => onRequestRename && setIsEditing(true)}>
+              {book.title}
+            </h3>
+            <p class="bookcard-horizontal-authors">{book.authors?.join(", ")}</p>
+          </div>
         )}
-        <p class="book-author">{book.authors?.join(", ")}</p>
-        <p class="book-isbn">ISBN: {book.isbn}</p>
-        {onRequestDelete && (
-          <button onClick={handleDeleteRequest} class="delete-button">Delete</button>
-        )}
+        <div class="bookcard-horizontal-desc">{book.description}</div>
+        <div class="bookcard-horizontal-footer">
+          <div class="bookcard-horizontal-meta">
+            <span class="bookcard-horizontal-isbn">ISBN: {book.isbn}</span>
+            <span class="bookcard-horizontal-date">{formatPublishDate(book.publishdate)}</span>
+          </div>
+          {onRequestDelete && (
+            <button onClick={handleDeleteRequest} class="bookcard-delete-btn">Delete</button>
+          )}
+        </div>
       </div>
       {isModalOpen && (
         <DeleteConfirmationModal onConfirm={handleConfirmDelete} onCancel={() => setIsModalOpen(false)} />
