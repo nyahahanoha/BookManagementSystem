@@ -548,3 +548,47 @@ html, body {
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
+
+.bookcard-title-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.bookcard-title-edit .searchform-blue-input {
+  flex-grow: 1;
+  padding: 0.2rem 0.8rem;
+  font-size: 1rem;
+}
+
+.bookcard-save-btn, .bookcard-cancel-btn {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.bookcard-save-btn {
+  background: #47c6ff;
+  color: #181e2a;
+  box-shadow: 0 2px 8px #47c6ff44;
+}
+
+.bookcard-save-btn:hover {
+  background: #223a5f;
+  color: #eaf6ff;
+}
+
+.bookcard-cancel-btn {
+  background: #223a5f;
+  color: #eaf6ff;
+  box-shadow: 0 2px 8px #223a5f44;
+}
+
+.bookcard-cancel-btn:hover {
+  background: #181e2a;
+}
