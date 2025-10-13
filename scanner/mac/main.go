@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,6 +15,7 @@ import (
 	book_management_systemv1connect "github.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1/book_management_systemv1connect"
 
 	"connectrpc.com/connect"
+	"github.com/BookManagementSystem/scanner/mac/authorization"
 	"github.com/BookManagementSystem/scanner/mac/bluetooth"
 	"github.com/BookManagementSystem/scanner/mac/common"
 	"github.com/BookManagementSystem/scanner/mac/config"
@@ -54,11 +56,20 @@ func main() {
 		log.Fatalf("failed to unmarshal yaml file: %v", err)
 	}
 
-	if cfg.API == "" || cfg.Token == "" {
-		log.Fatalf("api or token is empty")
+	if cfg.API == "" || cfg.CallBackPort == 0 {
+		log.Fatalf("api or callback port is empty")
 	}
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	apiURI, err := url.Parse(cfg.API)
+	if err != nil {
+		log.Fatalf("failed to parse api url: %v", err)
+	}
+	token, err := authorization.Authorization(*apiURI, cfg.CallBackPort)
+	if err != nil {
+		log.Fatal("failed to get token: %w", err)
+	}
 
 	scanner, err := NewScanner(logger, cfg)
 	if err != nil {
@@ -86,7 +97,7 @@ func main() {
 	)
 	ctx, cancel := context.WithCancel(context.Background())
 	ctx, callInfo := connect.NewClientContext(ctx)
-	callInfo.RequestHeader().Set("Authorization", cfg.Token)
+	callInfo.RequestHeader().Set("Authorization", "Pomerium "+token)
 	for {
 		select {
 		case result := <-ch:

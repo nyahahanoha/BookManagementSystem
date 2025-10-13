@@ -3,11 +3,11 @@ package config
 import "time"
 
 type Config struct {
-	Kind      ScannerComponent `yaml:"kind"`
-	API       string           `yaml:"api"`
-	Token     string           `yaml:"token"`
-	Default   DefaultConfig    `yaml:"default"`
-	Bluetooth BluetoothConfig  `yaml:"bluetooth"`
+	Kind         ScannerComponent `yaml:"kind"`
+	API          string           `yaml:"api"`
+	CallBackPort uint16           `yaml:"callback_port"`
+	Default      DefaultConfig    `yaml:"default"`
+	Bluetooth    BluetoothConfig  `yaml:"bluetooth"`
 }
 
 //go:generate go run github.com/dmarkham/enumer -type=ScannerComponent -yaml

@@ -1,8 +1,9 @@
 kind: Bluetooth
-token: ${BOOKS_API_TOKEN}
-api: http://localhost:8080
 bluetooth:
   name: HPRT-81BF
   service: 0000ff00-0000-1000-8000-00805f9b34fb
   characteristic: 0000ff01-0000-1000-8000-00805f9b34fb
   timeout: 30s
+
+api: https://books.nyahahanoha.net
+callback_port: 8080
