@@ -50,7 +50,7 @@ export default function BookCard({ book, apiBaseUrl, onDelete, onRequestDelete, 
     ? `${apiBaseUrl}/images/${book.imageurl}` : null;
 
   return (
-    <div class="book-card">
+    <div class="bookcard">
       {imageUrl ? (
         <img src={imageUrl} alt={`Cover of ${book.title}`} class="book-cover" />
       ) : (
