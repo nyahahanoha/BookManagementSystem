@@ -592,8 +592,6 @@ html, body {
 .bookcard-cancel-btn:hover {
   background: #181e2a;
 }
-<<<<<<< HEAD
-=======
 
 /* === Modal Styles === */
 .modal-overlay {
@@ -660,4 +658,3 @@ html, body {
   background-color: #d1d5db; /* cool-gray-300 */
   box-shadow: 0 0 0 3px rgba(209, 213, 219, 0.5);
 }
->>>>>>> e295d7aa346ec46f5df9edb4c45f4507e53a5281
