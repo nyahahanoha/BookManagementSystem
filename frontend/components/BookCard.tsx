@@ -71,34 +71,34 @@ export default function BookCard({ book, apiBaseUrl, onDelete, onRequestDelete, 
         )}
       </div>
       <div class="bookcard-horizontal-main">
-        {isEditing ? (
-          <div class="book-title-edit">
-            <input
-              type="text"
-              value={newTitle}
-              onInput={(e) => setNewTitle((e.target as HTMLInputElement).value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleRenameRequest()}
-              class="searchform-blue-input" // 既存のスタイルを流用
-            />
-            <button onClick={handleRenameRequest} class="book-title-save">Save</button>
-            <button
-              onClick={() => {
-                setIsEditing(false);
-                setNewTitle(book.title);
-              }}
-              class="book-title-cancel"
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <div class="bookcard-horizontal-header">
+        <div class="bookcard-horizontal-header">
+          {isEditing ? (
+            <div class="bookcard-title-edit">
+              <input
+                type="text"
+                value={newTitle}
+                onInput={(e) => setNewTitle((e.target as HTMLInputElement).value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleRenameRequest()}
+                class="searchform-blue-input"
+              />
+              <button onClick={handleRenameRequest} class="bookcard-save-btn">Save</button>
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  setNewTitle(book.title);
+                }}
+                class="bookcard-cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
             <h3 class="bookcard-horizontal-title" onClick={() => onRequestRename && setIsEditing(true)}>
               {book.title}
             </h3>
-            <p class="bookcard-horizontal-authors">{book.authors?.join(", ")}</p>
-          </div>
-        )}
+          )}
+          <p class="bookcard-horizontal-authors">{book.authors?.join(", ")}</p>
+        </div>
         <div class="bookcard-horizontal-desc">{book.description}</div>
         <div class="bookcard-horizontal-footer">
           <div class="bookcard-horizontal-meta">
