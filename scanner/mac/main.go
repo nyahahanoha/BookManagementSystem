@@ -113,7 +113,11 @@ func main() {
 				return
 			}
 			cancel()
+			if err := authorization.Logout(*apiURI); err != nil {
+				log.Fatalf("failed to logout: %v", err)
+			}
 			return
 		}
 	}
+
 }

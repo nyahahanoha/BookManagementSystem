@@ -90,3 +90,15 @@ func Authorization(api url.URL, callbackPort uint16) (string, error) {
 
 	return token, nil
 }
+
+func Logout(api url.URL) error {
+	logoutURI := url.URL{
+		Scheme: api.Scheme,
+		Host:   api.Host,
+		Path:   "/.pomerium/sign_out",
+	}
+	if err := openBrowser(logoutURI.String()); err != nil {
+		return fmt.Errorf("failed to open browser: %w", err)
+	}
+	return nil
+}
