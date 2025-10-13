@@ -33,12 +33,18 @@ idp_scopes:
 # https://pomerium.com/reference/#routes
 routes:
   - from: https://books.nyahahanoha.net
+    prefix: /book_management_system.v1.BookManagementService
+    to: http://booksystem_api:8080
+    pass_identity_headers: true
+    allow_any_authenticated_user: true
+  - from: https://books.nyahahanoha.net
+    prefix: /images
+    to: http://booksystem_api:8080
+    allow_any_authenticated_user: true
+  - from: https://books.nyahahanoha.net
     to: http://booksystem_ui:8000
     pass_identity_headers: true
     allow_any_authenticated_user: true
-  - from: https://books_api.nyahahanoha.net
-    to: http://booksystem_api:8080
-    allow_public_unauthenticated_access: true
   - from: https://verify.nyahahanoha.net
     to: http://verify:8000
     pass_identity_headers: true
