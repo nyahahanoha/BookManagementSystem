@@ -558,8 +558,8 @@ html, body {
 
 .bookcard-title-edit .searchform-blue-input {
   flex-grow: 1;
-  padding: 0.4rem 0.8rem;
-  font-size: 1rem;
+  padding: 0.8rem 0.8rem;
+  font-size: 1.4rem;
 }
 
 .bookcard-save-btn, .bookcard-cancel-btn {
