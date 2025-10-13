@@ -1,6 +1,4 @@
----
 version: v2
-
 
 managed:
   enabled: true
@@ -14,6 +12,10 @@ plugins:
   - local: protoc-gen-connect-go
     out: api
     opt: paths=source_relative
+  - local: protoc-gen-es
+    out: frontend/api
+    include_imports: true
+    opt: target=ts
 
 inputs:
   - directory: api

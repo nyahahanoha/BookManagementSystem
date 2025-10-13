@@ -1,20 +1,42 @@
 import { useEffect, useState } from "preact/hooks";
-import { BookInfo } from "../types/book.ts";
 import BookCard from "../components/BookCard.tsx";
 import SearchForm from "../components/SearchForm.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
 
+import { Book, Language } from "../types/book.ts";
+
 const PAGE_SIZE = 30;
+const API_BASE_URL = "http://localhost:8080"; // Backend URL
+const SERVICE_PATH = "book_management_system.v1.BookManagementService";
+
+// Helper to make ConnectRPC requests via fetch
+async function connectRpcFetch(method: string, body: Record<string, any> = {}) {
+  const url = `${API_BASE_URL}/${SERVICE_PATH}/${method}`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Request failed with status ${response.status}: ${errorText}`);
+  }
+
+  return response.json();
+}
 
 interface Props {
   canDelete: boolean;
 }
 
 export default function BookManager({ canEdit }: Props) {
-  const [books, setBooks] = useState<BookInfo[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<BookInfo[] | null>(null);
+  const [searchResults, setSearchResults] = useState<Book[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState(1);
@@ -24,15 +46,12 @@ export default function BookManager({ canEdit }: Props) {
     loadAllBooks();
   }, []);
 
-  // サーバ経由で全件取得
   const loadAllBooks = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/books");
-      if (!res.ok) throw new Error("Failed to fetch books");
-      const data = await res.json();
-      setBooks(data.books || []);
+      const res = await connectRpcFetch("GetAllBooks", {});
+      setBooks(res.books || []);
       setSearchResults(null);
       setSearchQuery("");
       setPage(1);
@@ -44,7 +63,6 @@ export default function BookManager({ canEdit }: Props) {
     }
   };
 
-  // 検索（GET パラメータを利用）
   const handleSearch = async (query: string, type: 'isbn' | 'title') => {
     setSearchLoading(true);
     setError(null);
@@ -59,12 +77,13 @@ export default function BookManager({ canEdit }: Props) {
     }
 
     try {
-      // type によって API のクエリキーを切り替え
-      const param = type === "isbn" ? "isbn" : "title";
-      const res = await fetch(`/api/books?${param}=${encodeURIComponent(query)}`);
-      if (!res.ok) throw new Error("Search failed");
-      const data = await res.json();
-      setSearchResults(data.books || []);
+      if (type === "isbn") {
+        const res = await connectRpcFetch("GetBook", { isbn: query });
+        setSearchResults(res.book ? [res.book] : []);
+      } else {
+        const res = await connectRpcFetch("SearchBook", { title: query });
+        setSearchResults(res.books || []);
+      }
     } catch (err) {
       setError("Search failed. Please try again.");
       console.error("Search error:", err);
@@ -73,31 +92,22 @@ export default function BookManager({ canEdit }: Props) {
     }
   };
 
-//  // 削除（サーバ経由）
-//  const handleDelete = async (isbn: string) => {
-//    try {
-//      const res = await fetch("/api/books", {
-//        method: "DELETE",
-//        headers: { "Content-Type": "application/json" },
-//        body: JSON.stringify({ isbn }),
-//      });
-//      if (!res.ok) throw new Error("Delete failed");
-//
-//      // 成功したら表示から除去
-//      if (searchResults !== null) {
-//        setSearchResults(searchResults.filter(book => book.ISBN !== isbn));
-//      }
-//      setBooks(books.filter(book => book.ISBN !== isbn));
-//    } catch (err) {
-//      setError("Failed to delete book.");
-//      console.error(err);
-//    }
-//  };
+  const handleDelete = async (isbn: string) => {
+    try {
+      await connectRpcFetch("DeleteBook", { isbn });
+      if (searchResults !== null) {
+        setSearchResults(searchResults.filter(book => book.isbn !== isbn));
+      }
+      setBooks(books.filter(book => book.isbn !== isbn));
+    } catch (err) {
+      setError("Failed to delete book.");
+      console.error(err);
+    }
+  };
 
   const displayBooks = searchResults === null ? books : searchResults;
   const isEmpty = !displayBooks || displayBooks.length === 0;
 
-  // ページネーション
   const totalPages = Math.ceil(displayBooks.length / PAGE_SIZE);
   const pagedBooks = displayBooks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -139,17 +149,18 @@ export default function BookManager({ canEdit }: Props) {
               <div class="bookmanager-grid">
                 {pagedBooks.map((book) => (
                   <BookCard
-                    key={book.ISBN}
+                    key={book.isbn}
                     book={book}
-                    //onDelete={handleDelete}
+                    onDelete={handleDelete}
                     {...(canEdit && {
                       onRequestDelete: async (isbn: string) => {
-                        const res = await fetch("/api/books", {
-                          method: "DELETE",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ isbn }),
-                        });
-                        return res.ok;
+                        try {
+                          await connectRpcFetch("DeleteBook", { isbn });
+                          return true;
+                        } catch (err) {
+                          console.error(err);
+                          return false;
+                        }
                       },
                     })}
                   />

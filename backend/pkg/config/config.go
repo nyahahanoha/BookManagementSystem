@@ -9,6 +9,7 @@ type Config struct {
 	BooksConfig booksconfig.Config `yaml:"books"`
 	StoreConfig storeconfig.Config `yaml:"store"`
 
-	Address string `yaml:"address"`
-	Token   string `yaml:"token"`
+	Address         string `yaml:"address"`
+	AdminEmail      string `yaml:"admin_email"`
+	PomeriumJWKSURL string `yaml:"pomerium_jwks_url"`
 }

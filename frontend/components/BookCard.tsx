@@ -1,33 +1,28 @@
-import { BookInfo, LanguageMap } from "../types/book.ts";
+import { Book } from "../types/book.ts";
 import { useState, useEffect } from "preact/hooks";
 
-export default function BookCard({
-  book,
-  onRequestDelete, // サーバ経由で削除する関数を親から渡す
-}: {
-  book: BookInfo;
+export const LanguageMap = {
+  0: "Unknown",
+  1: "Japanese",
+  2: "English",
+} as const;
+
+export default function BookCard({ book, onRequestDelete }: {
+  book: Book;
   onDelete?: (isbn: string) => void;
   onRequestDelete?: (isbn: string) => Promise<boolean>;
 }) {
-  const title = book.Title;
-  const authors = book.Authors;
-  const description = book.Description;
-  const imageFileName = book.Image?.Path;
-  const isbn = book.ISBN;
-  const publishdate = book.Publishdate;
-  const language = LanguageMap[book.Language] || "Unknown";
-  const [deleted, setDeleted] = useState(false); // ← ボタン状態
-
-  const [imageUrl, setImageUrl] = useState<string>(imageFileName || "");
+  const { title, authors, description, imageurl, isbn, publishdate, language } = book;
+  const [deleted, setDeleted] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   useEffect(() => {
-  if (imageFileName) {
-    setImageUrl(`/api/images?filename=${encodeURIComponent(imageFileName)}`);
-  } else {
-    setImageUrl("");
-  }
-}, [imageFileName]);
-
+    if (imageurl) {
+      setImageUrl(`/api/images?filename=${encodeURIComponent(imageurl)}`);
+    } else {
+      setImageUrl("");
+    }
+  }, [imageurl]);
 
   let yearMonth = "";
   if (publishdate) {
@@ -38,11 +33,11 @@ export default function BookCard({
   }
 
   const handleDelete = async () => {
-    if (deleted) return; // ← 既に削除済みなら何もしない
+    if (deleted) return;
     if (!isbn || !onRequestDelete) return;
-    const success = await onRequestDelete(isbn); // サーバに削除依頼
+    const success = await onRequestDelete(isbn);
     if (success) {
-      setDeleted(true); // ← 削除成功なら状態更新
+      setDeleted(true);
     }
   };
 
@@ -55,7 +50,7 @@ export default function BookCard({
           <div class="bookcard-img-placeholder">No Image</div>
         )}
       </div>
-      <div class="bookcard-horizontal-main">
+      <div class_="bookcard-horizontal-main">
         <div class="bookcard-horizontal-header">
           <h3 class="bookcard-horizontal-title">{title}</h3>
           <p class="bookcard-horizontal-authors">
@@ -67,7 +62,7 @@ export default function BookCard({
           <div class="bookcard-horizontal-meta">
             <span class="bookcard-horizontal-isbn">ISBN: {isbn}</span>
             <span class="bookcard-horizontal-date">{yearMonth}</span>
-            <span class="bookcard-horizontal-date">{language}</span>
+            <span class="bookcard-horizontal-date">{LanguageMap[language]}</span>
           </div>
           {onRequestDelete && (
             <button

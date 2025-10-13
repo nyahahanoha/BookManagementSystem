@@ -11,9 +11,11 @@ import (
 	"syscall"
 
 	"connectrpc.com/connect"
+	"github.com/lestrrat-go/jwx/v2/jwk"
 	"github.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1/book_management_systemv1connect"
 	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/config"
 	"github.com/nyahahanoha/BookManagementSystem/backend/pkg/service"
+	"github.com/rs/cors"
 	"gopkg.in/yaml.v3"
 )
 
@@ -36,22 +38,34 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create service: %v", err)
 	}
+
+	jwks, err := jwk.Fetch(context.Background(), cfg.PomeriumJWKSURL)
+	if err != nil {
+		logger.Error("failed to fetch jwks", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	pomeriumAuth := service.NewAuthInterceptor(jwks, logger, cfg.AdminEmail)
+
 	mux := http.NewServeMux()
 	path, handler := book_management_systemv1connect.NewBookManagementServiceHandler(
 		books,
-		connect.WithInterceptors(service.NewAuthorizationInterceptor(cfg.Token, logger)),
+		connect.WithInterceptors(pomeriumAuth),
 	)
 	mux.Handle(path, handler)
 
 	mux.HandleFunc("/images/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Authorization") != cfg.Token {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
 		if strings.HasPrefix(r.URL.Path, "/images/") {
 			filePath := "/var/lib/booksystem" + r.URL.Path[len("/images"):]
 			http.ServeFile(w, r, filePath)
 		}
+	})
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:     []string{"http://localhost:3000"}, // フロントのURL
+		AllowedMethods:     []string{"POST", "OPTIONS"},
+		AllowedHeaders:     []string{"Content-Type", "Authorization"},
+		AllowCredentials:   true,
+		OptionsPassthrough: true,
 	})
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -73,7 +87,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    cfg.Address,
-		Handler: mux,
+		Handler: c.Handler(mux),
 	}
 
 	go func() {

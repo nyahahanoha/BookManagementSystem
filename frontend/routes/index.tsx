@@ -1,25 +1,26 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import BookManager from "../islands/BookManager.tsx";
-import { decode } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const ADMIN_EMAILS = (Deno.env.get("ADMIN_EMAILS") || "example@gmail.com")
   .split(",")
-  .map(email => email.trim())
-
+  .map(email => email.trim());
+const JWKS_URL = (Deno.env.get("JWKS_URL") || "https://auth.example.com/.well-known/pomerium/jwks.json");
+const jwks = createRemoteJWKSet(new URL(JWKS_URL));
 
 interface Data {
   claims: Record<string, unknown> | null;
 }
 
 export const handler: Handlers<Data> = {
-  GET(req, ctx) {
+  async GET(req, ctx) {
     const jwt = req.headers.get("X-Pomerium-Jwt-Assertion");
 
     let claims: Record<string, unknown> | null = null;
     if (jwt) {
       try {
-        const [, payload] = decode<{ [name: string]: string }>(jwt);
-        claims = payload;
+        const { payload } = await jwtVerify(jwt, jwks);
+        claims = payload as Record<string, unknown>;
         console.log("Decoded JWT claims:", claims);
       } catch (e) {
         console.error("JWT decode error:", e);

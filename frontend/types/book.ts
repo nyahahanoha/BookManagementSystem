@@ -1,36 +1,15 @@
-// types/book.ts
-export interface BookInfo {
-  ISBN: string;
-  Title: string;
-  Authors: string[];
-  Description: string;
-  Publishdate: string;
-  Language: number;
-  Image: {
-    Source: {
-      Scheme: string;
-      Opaque: string;
-      User: null;
-      Host: string;
-      Path: string;
-      RawPath: string;
-      OmitHost: boolean;
-      ForceQuery: boolean;
-      RawQuery: string;
-      Fragment: string;
-      RawFragment: string;
-    };
-    Path: string;
-  };
+export enum Language {
+  UNKNOWN = 0,
+  ENGLISH = 1,
+  JAPANESE = 2,
 }
 
-export interface BooksResponse {
-  books: BookInfo[] | null;
-  count: number;
+export interface Book {
+  isbn: string;
+  title: string;
+  authors: string[];
+  description: string;
+  publishdate: string;
+  language: Language;
+  imageurl: string;
 }
-
-export const LanguageMap = {
-  0: "Unknown",
-  1: "Japanese",
-  2: "English",
-} as const;
