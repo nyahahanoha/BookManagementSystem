@@ -1,80 +1,98 @@
+import { useState } from "preact/hooks";
 import { Book } from "../types/book.ts";
-import { useState, useEffect } from "preact/hooks";
+import DeleteConfirmationModal from "./DeleteConfirmationModal.tsx";
 
-export const LanguageMap = {
-  0: "Unknown",
-  1: "Japanese",
-  2: "English",
-} as const;
-
-export default function BookCard({ book, onRequestDelete }: {
+interface Props {
   book: Book;
+  apiBaseUrl: string;
   onDelete?: (isbn: string) => void;
   onRequestDelete?: (isbn: string) => Promise<boolean>;
-}) {
-  const { title, authors, description, imageurl, isbn, publishdate, language } = book;
-  const [deleted, setDeleted] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string>("");
+  onRequestRename?: (isbn: string, newTitle: string) => Promise<boolean>;
+}
 
-  useEffect(() => {
-    if (imageurl) {
-      setImageUrl(`/api/images?filename=${encodeURIComponent(imageurl)}`);
-    } else {
-      setImageUrl("");
-    }
-  }, [imageurl]);
+export default function BookCard({ book, apiBaseUrl, onDelete, onRequestDelete, onRequestRename }: Props) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newTitle, setNewTitle] = useState(book.title);
 
-  let yearMonth = "";
-  if (publishdate) {
-    const [year, month] = publishdate.split("-");
-    if (year && month) {
-      yearMonth = `${year}-${month}`;
-    }
-  }
-
-  const handleDelete = async () => {
-    if (deleted) return;
-    if (!isbn || !onRequestDelete) return;
-    const success = await onRequestDelete(isbn);
-    if (success) {
-      setDeleted(true);
+  const handleDeleteRequest = () => {
+    if (onRequestDelete) {
+      setIsModalOpen(true);
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (onRequestDelete) {
+      const success = await onRequestDelete(book.isbn);
+      if (success) {
+        onDelete?.(book.isbn);
+      }
+    }
+    setIsModalOpen(false);
+  };
+
+  const handleRenameRequest = async () => {
+    if (!onRequestRename || newTitle.trim() === "" || newTitle === book.title) {
+      setIsEditing(false);
+      setNewTitle(book.title); // Reset title on cancel or invalid input
+      return;
+    }
+    const success = await onRequestRename(book.isbn, newTitle);
+    if (success) {
+      setIsEditing(false);
+    }
+    // If it fails, the BookManager will show an error, and we keep the editing state
+    // for the user to retry or cancel.
+  };
+
+  // バックエンドの画像URLを直接参照するように変更
+  const imageUrl = book.imageurl
+    ? `${apiBaseUrl}/images/${book.imageurl}` : null;
+
   return (
-    <div class="bookcard-horizontal">
-      <div class="bookcard-horizontal-img">
-        {imageUrl ? (
-          <img src={imageUrl} alt="" class="bookcard-horizontal-img-el" />
+    <div class="book-card">
+      {imageUrl ? (
+        <img src={imageUrl} alt={`Cover of ${book.title}`} class="book-cover" />
+      ) : (
+        <div class="book-cover book-cover-placeholder">
+          <span>No Image</span>
+        </div>
+      )}
+      <div class="book-info">
+        {isEditing ? (
+          <div class="book-title-edit">
+            <input
+              type="text"
+              value={newTitle}
+              onInput={(e) => setNewTitle((e.target as HTMLInputElement).value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleRenameRequest()}
+              class="book-title-input"
+            />
+            <button onClick={handleRenameRequest} class="book-title-save">Save</button>
+            <button
+              onClick={() => {
+                setIsEditing(false);
+                setNewTitle(book.title);
+              }}
+              class="book-title-cancel"
+            >
+              Cancel
+            </button>
+          </div>
         ) : (
-          <div class="bookcard-img-placeholder">No Image</div>
+          <h3 class="book-title" onClick={() => onRequestRename && setIsEditing(true)}>
+            {book.title}
+          </h3>
+        )}
+        <p class="book-author">{book.authors?.join(", ")}</p>
+        <p class="book-isbn">ISBN: {book.isbn}</p>
+        {onRequestDelete && (
+          <button onClick={handleDeleteRequest} class="delete-button">Delete</button>
         )}
       </div>
-      <div class_="bookcard-horizontal-main">
-        <div class="bookcard-horizontal-header">
-          <h3 class="bookcard-horizontal-title">{title}</h3>
-          <p class="bookcard-horizontal-authors">
-            {Array.isArray(authors) ? authors.join(", ") : authors}
-          </p>
-        </div>
-        <div class="bookcard-horizontal-desc">{description}</div>
-        <div class="bookcard-horizontal-footer">
-          <div class="bookcard-horizontal-meta">
-            <span class="bookcard-horizontal-isbn">ISBN: {isbn}</span>
-            <span class="bookcard-horizontal-date">{yearMonth}</span>
-            <span class="bookcard-horizontal-date">{LanguageMap[language]}</span>
-          </div>
-          {onRequestDelete && (
-            <button
-              class={`bookcard-delete-btn ${deleted ? "deleted" : ""}`}
-              onClick={handleDelete}
-              disabled={deleted}
-            >
-              {deleted ? "Deleted" : "Delete"}
-            </button>
-          )}
-        </div>
-      </div>
+      {isModalOpen && (
+        <DeleteConfirmationModal onConfirm={handleConfirmDelete} onCancel={() => setIsModalOpen(false)} />
+      )}
     </div>
   );
 }

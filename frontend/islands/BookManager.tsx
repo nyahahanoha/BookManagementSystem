@@ -105,6 +105,27 @@ export default function BookManager({ canEdit }: Props) {
     }
   };
 
+  const handleRename = async (isbn: string, newTitle: string): Promise<boolean> => {
+    try {
+      await connectRpcFetch("RenameBook", { isbn, title: newTitle });
+
+      const updateBookTitle = (bookList: Book[]) =>
+        bookList.map((book) =>
+          book.isbn === isbn ? { ...book, title: newTitle } : book
+        );
+
+      setBooks(updateBookTitle(books));
+      if (searchResults) {
+        setSearchResults(updateBookTitle(searchResults));
+      }
+      return true;
+    } catch (err) {
+      setError("Failed to rename book.");
+      console.error("Rename error:", err);
+      return false;
+    }
+  };
+
   const displayBooks = searchResults === null ? books : searchResults;
   const isEmpty = !displayBooks || displayBooks.length === 0;
 
@@ -151,17 +172,20 @@ export default function BookManager({ canEdit }: Props) {
                   <BookCard
                     key={book.isbn}
                     book={book}
-                    onDelete={handleDelete}
+                    apiBaseUrl={API_BASE_URL}
                     {...(canEdit && {
+                      onDelete: handleDelete,
                       onRequestDelete: async (isbn: string) => {
                         try {
                           await connectRpcFetch("DeleteBook", { isbn });
                           return true;
                         } catch (err) {
                           console.error(err);
+                          setError("Failed to delete book.");
                           return false;
                         }
                       },
+                      onRequestRename: handleRename,
                     })}
                   />
                 ))}
