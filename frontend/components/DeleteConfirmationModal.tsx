@@ -7,14 +7,13 @@ export default function DeleteConfirmationModal({ onConfirm, onCancel }: Props) 
   return (
     <div class="modal-overlay">
       <div class="modal-content">
-        <h2>Confirm Deletion</h2>
-        <p>Are you sure you want to delete this book? This action cannot be undone.</p>
+        <p class="modal-text">Do you really want to delete this book?</p>
         <div class="modal-actions">
           <button onClick={onCancel} class="modal-button cancel">
-            Cancel
+            No
           </button>
           <button onClick={onConfirm} class="modal-button confirm">
-            Delete
+            Yes
           </button>
         </div>
       </div>
