@@ -85,20 +85,16 @@ func (s *NDL) GetInfo(isbn string) (*bookscommon.Info, error) {
 	for _, item := range rss.Channel.Items {
 		fullTitle := item.Title + " " + item.Volume
 
-		titlePre := strings.Split(info.Title, " ")
-		titleNext := strings.Split(fullTitle, " ")
+		titles := append(strings.Fields(fullTitle), strings.Fields(info.Title)...)
+		seen := make(map[string]bool)
+		merged := []string{}
+		for _, title := range titles {
+			if !seen[title] {
+				seen[title] = true
+				merged = append(merged, title)
+			}
+		}
 
-		unique := make(map[string]struct{})
-		for _, w := range titleNext {
-			unique[w] = struct{}{}
-		}
-		for _, w := range titlePre {
-			unique[w] = struct{}{}
-		}
-		var merged []string
-		for w := range unique {
-			merged = append(merged, w)
-		}
 		info.Title = strings.Join(merged, " ")
 	}
 
