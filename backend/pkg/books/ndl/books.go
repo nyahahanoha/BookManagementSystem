@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	bookscommon "github.com/nyahahanoha/BookManagementSystem/backend/pkg/books/common"
@@ -81,6 +82,26 @@ func (s *NDL) GetInfo(isbn string) (*bookscommon.Info, error) {
 
 	item := rss.Channel.Items[0]
 	info := ToBookInfo(item)
+	for _, item := range rss.Channel.Items {
+		fullTitle := item.Title + " " + item.Volume
+
+		titlePre := strings.Split(info.Title, " ")
+		titleNext := strings.Split(fullTitle, " ")
+
+		unique := make(map[string]struct{})
+		for _, w := range titleNext {
+			unique[w] = struct{}{}
+		}
+		for _, w := range titlePre {
+			unique[w] = struct{}{}
+		}
+		var merged []string
+		for w := range unique {
+			merged = append(merged, w)
+		}
+		info.Title = strings.Join(merged, " ")
+	}
+
 	info.ISBN = isbn
 	info.Language = bookscommon.JP
 	info.Description = bookscommon.NoDescription
