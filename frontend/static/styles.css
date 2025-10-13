@@ -422,7 +422,7 @@
   font-size: 2.2rem;
   font-weight: 900;
   color: #eaf6ff;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   letter-spacing: 0.04em;
   text-shadow: 0 2px 8px #0008;
   font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
@@ -558,8 +558,8 @@ html, body {
 
 .bookcard-title-edit .searchform-blue-input {
   flex-grow: 1;
-  padding: 0.8rem 0.8rem;
-  font-size: 1.4rem;
+  padding: 0.6rem 0.3rem;
+  font-size: 1.2rem;
 }
 
 .bookcard-save-btn, .bookcard-cancel-btn {
