@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"fmt"
 
 	"connectrpc.com/connect"
 	"github.com/lestrrat-go/jwx/v2/jwk"
@@ -88,10 +87,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    cfg.Address,
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Printf("Request: %s %s\n", r.Method, r.URL.Path)
-			c.Handler(mux).ServeHTTP(w, r)
-		}),
+		Handler: c.Handler(mux),
 	}
 
 	go func() {

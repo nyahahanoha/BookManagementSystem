@@ -79,8 +79,6 @@ func (s *NDL) GetInfo(isbn string) (*bookscommon.Info, error) {
 		return nil, fmt.Errorf("no book found for ISBN: %s", isbn)
 	}
 
-	fmt.Printf("%+v\n", rss.Channel.Items[0])
-
 	item := rss.Channel.Items[0]
 	info := ToBookInfo(item)
 	info.ISBN = isbn
