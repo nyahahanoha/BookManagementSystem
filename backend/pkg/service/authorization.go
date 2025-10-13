@@ -61,7 +61,6 @@ func (i *AuthInterceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 		}
 
 		claims, _ := token.Claims.(jwt.MapClaims)
-		fmt.Println(claims)
 		if email, ok := claims["email"].(string); ok {
 			if strings.HasSuffix(req.Spec().Procedure, "GetAllBooks") ||
 				strings.HasSuffix(req.Spec().Procedure, "GetBook") ||
