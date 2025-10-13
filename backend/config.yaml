@@ -9,7 +9,7 @@ store:
   db:
     kind: MySQL
     mysql:
-      address: localhost
+      address: booksystem_db
       port: 3306
       user: ${MYSQL_USER}
       password: ${MYSQL_PASSWORD}
@@ -20,4 +20,6 @@ store:
       path: /var/lib/booksystem
 
 address: ":8080"
-token: ${BOOKS_API_TOKEN}
+admin_email: ${ADMIN_EMAILS}
+pomerium_jwks_url: ${JWKS_URL}
+frontend_url: https://books.nyahahanoha.net

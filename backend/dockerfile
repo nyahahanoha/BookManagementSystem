@@ -1,19 +1,15 @@
-# ビルド用
-FROM golang:1.24 AS builder
-WORKDIR /app
-
-COPY . .
-RUN go mod tidy
-RUN GOOS=linux GOARCH=amd64 go build -o bookMgmtSystem main.go
-
-# 実行用（Alpine など軽量イメージ）
+# 実行用イメージ（Alpine や Ubuntuなど軽量）
 FROM ubuntu:latest
 WORKDIR /app
 
-COPY --from=builder /app/bookMgmtSystem .
+# ローカルでビルドしたバイナリをコピー
+COPY ./bookMgmtSystem .
+COPY ./config.yaml .
+
+# 実行権限を付与
 RUN chmod +x bookMgmtSystem
-RUN apt-get update && apt-get install -y ca-certificates
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 8080
-# 実行
+
 CMD ["/app/bookMgmtSystem"]

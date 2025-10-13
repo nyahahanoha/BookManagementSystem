@@ -6,7 +6,7 @@ import LoadingSpinner from "../components/LoadingSpinner.tsx";
 import { Book, Language } from "../types/book.ts";
 
 const PAGE_SIZE = 30;
-const API_BASE_URL = "http://localhost:8080"; // Backend URL
+const API_BASE_URL = "https://books.nyahahanoha.net"; // Backend URL
 const SERVICE_PATH = "book_management_system.v1.BookManagementService";
 
 // Helper to make ConnectRPC requests via fetch

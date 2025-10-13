@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"fmt"
 
 	"connectrpc.com/connect"
 	"github.com/lestrrat-go/jwx/v2/jwk"
@@ -61,11 +62,11 @@ func main() {
 	})
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:     []string{"http://localhost:3000"}, // フロントのURL
-		AllowedMethods:     []string{"POST", "OPTIONS"},
-		AllowedHeaders:     []string{"Content-Type", "Authorization"},
+		AllowedOrigins:     []string{cfg.FrontendURL}, // フロントのURL
+		AllowedMethods:     []string{"POST", "PUT", "GET", "DELETE", "OPTIONS"},
+		AllowedHeaders:     []string{"Content-Type", "X-Pomerium-Jwt-Assertion"},
 		AllowCredentials:   true,
-		OptionsPassthrough: true,
+		OptionsPassthrough: false,
 	})
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -87,7 +88,10 @@ func main() {
 
 	server := &http.Server{
 		Addr:    cfg.Address,
-		Handler: c.Handler(mux),
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			fmt.Printf("Request: %s %s\n", r.Method, r.URL.Path)
+			c.Handler(mux).ServeHTTP(w, r)
+		}),
 	}
 
 	go func() {

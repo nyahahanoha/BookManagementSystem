@@ -12,4 +12,5 @@ type Config struct {
 	Address         string `yaml:"address"`
 	AdminEmail      string `yaml:"admin_email"`
 	PomeriumJWKSURL string `yaml:"pomerium_jwks_url"`
+	FrontendURL string `yaml:"frontend_url"`
 }

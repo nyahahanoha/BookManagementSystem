@@ -130,7 +130,7 @@ func convertInfoToProtobuf(info bookscommon.Info) *book_management_systemv1.Book
 		Description: info.Description,
 		Publishdate: info.Publishdate.Format("2006-01"),
 		Language:    language,
-		Imageurl:    info.Image.Source.String(),
+		Imageurl:    info.Image.Path,
 	}
 }
 
