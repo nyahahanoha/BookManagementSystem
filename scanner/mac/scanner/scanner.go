@@ -1,6 +1,7 @@
 package scanner
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 
@@ -11,8 +12,7 @@ import (
 
 type Scanner interface {
 	Connect() error
-	Run(ch chan common.Result) error
-	Close() error
+	Run(ctx context.Context, ch chan common.Result) error
 }
 
 func NewScanner(lg *slog.Logger, c config.Config) (Scanner, error) {

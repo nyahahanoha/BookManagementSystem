@@ -22,6 +22,7 @@ type DefaultConfig struct {
 }
 
 type BluetoothConfig struct {
+	Enabled            bool          `yaml:"enabled"`
 	Name               string        `yaml:"name"`
 	Timeout            time.Duration `yaml:"timeout"`
 	ServiceUUID        string        `yaml:"service"`

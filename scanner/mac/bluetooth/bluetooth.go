@@ -1,6 +1,7 @@
 package bluetooth
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"time"
@@ -19,8 +20,7 @@ type Bluetooth struct {
 	ServiceUUID        string
 	CharacteristicUUID string
 
-	device  *ble.Device
-	closech chan struct{}
+	device *ble.Device
 }
 
 var adapter = ble.DefaultAdapter
@@ -36,15 +36,6 @@ func NewBluetooth(lg *slog.Logger, config config.BluetoothConfig) (*Bluetooth, e
 		ServiceUUID:        config.ServiceUUID,
 		CharacteristicUUID: config.CharacteristicUUID,
 	}, nil
-}
-
-func (s *Bluetooth) Close() error {
-	s.lg.Info("Close Bluetooth")
-	if s.device != nil {
-		close(s.closech)
-		return s.device.Disconnect()
-	}
-	return nil
 }
 
 func (s *Bluetooth) Connect() error {
@@ -85,7 +76,7 @@ func (s *Bluetooth) Connect() error {
 	}
 }
 
-func (s *Bluetooth) Run(ch chan common.Result) error {
+func (s *Bluetooth) Run(ctx context.Context, ch chan common.Result) error {
 	services, err := s.device.DiscoverServices(nil)
 	if err != nil {
 		return fmt.Errorf("failed to discover service: %w", err)
@@ -119,10 +110,9 @@ func (s *Bluetooth) Run(ch chan common.Result) error {
 			}
 		}
 	}
-	s.closech = make(chan struct{})
-
-	<-s.closech
+	<-ctx.Done()
 	close(ch)
 
-	return nil
+	s.lg.Info("Close Bluetooth")
+	return s.device.Disconnect()
 }

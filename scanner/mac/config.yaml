@@ -1,5 +1,6 @@
 kind: Bluetooth
 bluetooth:
+  enabled: true
   name: HPRT-81BF
   service: 0000ff00-0000-1000-8000-00805f9b34fb
   characteristic: 0000ff01-0000-1000-8000-00805f9b34fb
