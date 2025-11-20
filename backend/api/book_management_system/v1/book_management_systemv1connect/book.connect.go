@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	v1 "github.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1"
+	v1 "github.com/nyahahanoha/BookManagementSystem/backend/api/book_management_system/v1"
 	http "net/http"
 	strings "strings"
 )

@@ -722,8 +722,8 @@ const file_book_management_system_v1_book_proto_rawDesc = "" +
 	"\n" +
 	"RenameBook\x12,.book_management_system.v1.RenameBookRequest\x1a-.book_management_system.v1.RenameBookResponse\x12i\n" +
 	"\n" +
-	"DeleteBook\x12,.book_management_system.v1.DeleteBookRequest\x1a-.book_management_system.v1.DeleteBookResponseB\x8b\x02\n" +
-	"\x1dcom.book_management_system.v1B\tBookProtoP\x01Zbgithub.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1;book_management_systemv1\xa2\x02\x03BXX\xaa\x02\x17BookManagementSystem.V1\xca\x02\x17BookManagementSystem\\V1\xe2\x02#BookManagementSystem\\V1\\GPBMetadata\xea\x02\x18BookManagementSystem::V1b\x06proto3"
+	"DeleteBook\x12,.book_management_system.v1.DeleteBookRequest\x1a-.book_management_system.v1.DeleteBookResponseB\x93\x02\n" +
+	"\x1dcom.book_management_system.v1B\tBookProtoP\x01Zjgithub.com/nyahahanoha/BookManagementSystem/backend/api/book_management_system/v1;book_management_systemv1\xa2\x02\x03BXX\xaa\x02\x17BookManagementSystem.V1\xca\x02\x17BookManagementSystem\\V1\xe2\x02#BookManagementSystem\\V1\\GPBMetadata\xea\x02\x18BookManagementSystem::V1b\x06proto3"
 
 var (
 	file_book_management_system_v1_book_proto_rawDescOnce sync.Once
