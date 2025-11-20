@@ -15,6 +15,7 @@ message PutBookRequest {
   string isbn = 1;
 }
 message PutBookResponse {
+  Book book = 1;
 }
 
 message GetBookRequest {

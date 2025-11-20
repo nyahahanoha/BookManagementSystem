@@ -116,6 +116,7 @@ func (x *PutBookRequest) GetIsbn() string {
 
 type PutBookResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Book          *Book                  `protobuf:"bytes,1,opt,name=book,proto3" json:"book,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -148,6 +149,13 @@ func (x *PutBookResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use PutBookResponse.ProtoReflect.Descriptor instead.
 func (*PutBookResponse) Descriptor() ([]byte, []int) {
 	return file_book_management_system_v1_book_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *PutBookResponse) GetBook() *Book {
+	if x != nil {
+		return x.Book
+	}
+	return nil
 }
 
 type GetBookRequest struct {
@@ -672,8 +680,9 @@ const file_book_management_system_v1_book_proto_rawDesc = "" +
 	"\n" +
 	"$book_management_system/v1/book.proto\x12\x19book_management_system.v1\"$\n" +
 	"\x0ePutBookRequest\x12\x12\n" +
-	"\x04isbn\x18\x01 \x01(\tR\x04isbn\"\x11\n" +
-	"\x0fPutBookResponse\"$\n" +
+	"\x04isbn\x18\x01 \x01(\tR\x04isbn\"F\n" +
+	"\x0fPutBookResponse\x123\n" +
+	"\x04book\x18\x01 \x01(\v2\x1f.book_management_system.v1.BookR\x04book\"$\n" +
 	"\x0eGetBookRequest\x12\x12\n" +
 	"\x04isbn\x18\x01 \x01(\tR\x04isbn\"F\n" +
 	"\x0fGetBookResponse\x123\n" +
@@ -747,27 +756,28 @@ var file_book_management_system_v1_book_proto_goTypes = []any{
 	(*DeleteBookResponse)(nil),  // 13: book_management_system.v1.DeleteBookResponse
 }
 var file_book_management_system_v1_book_proto_depIdxs = []int32{
-	9,  // 0: book_management_system.v1.GetBookResponse.book:type_name -> book_management_system.v1.Book
-	9,  // 1: book_management_system.v1.GetAllBooksResponse.books:type_name -> book_management_system.v1.Book
-	9,  // 2: book_management_system.v1.SearchBookResponse.books:type_name -> book_management_system.v1.Book
-	0,  // 3: book_management_system.v1.Book.language:type_name -> book_management_system.v1.Language
-	1,  // 4: book_management_system.v1.BookManagementService.PutBook:input_type -> book_management_system.v1.PutBookRequest
-	3,  // 5: book_management_system.v1.BookManagementService.GetBook:input_type -> book_management_system.v1.GetBookRequest
-	5,  // 6: book_management_system.v1.BookManagementService.GetAllBooks:input_type -> book_management_system.v1.GetAllBooksRequest
-	7,  // 7: book_management_system.v1.BookManagementService.SearchBook:input_type -> book_management_system.v1.SearchBookRequest
-	10, // 8: book_management_system.v1.BookManagementService.RenameBook:input_type -> book_management_system.v1.RenameBookRequest
-	12, // 9: book_management_system.v1.BookManagementService.DeleteBook:input_type -> book_management_system.v1.DeleteBookRequest
-	2,  // 10: book_management_system.v1.BookManagementService.PutBook:output_type -> book_management_system.v1.PutBookResponse
-	4,  // 11: book_management_system.v1.BookManagementService.GetBook:output_type -> book_management_system.v1.GetBookResponse
-	6,  // 12: book_management_system.v1.BookManagementService.GetAllBooks:output_type -> book_management_system.v1.GetAllBooksResponse
-	8,  // 13: book_management_system.v1.BookManagementService.SearchBook:output_type -> book_management_system.v1.SearchBookResponse
-	11, // 14: book_management_system.v1.BookManagementService.RenameBook:output_type -> book_management_system.v1.RenameBookResponse
-	13, // 15: book_management_system.v1.BookManagementService.DeleteBook:output_type -> book_management_system.v1.DeleteBookResponse
-	10, // [10:16] is the sub-list for method output_type
-	4,  // [4:10] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	9,  // 0: book_management_system.v1.PutBookResponse.book:type_name -> book_management_system.v1.Book
+	9,  // 1: book_management_system.v1.GetBookResponse.book:type_name -> book_management_system.v1.Book
+	9,  // 2: book_management_system.v1.GetAllBooksResponse.books:type_name -> book_management_system.v1.Book
+	9,  // 3: book_management_system.v1.SearchBookResponse.books:type_name -> book_management_system.v1.Book
+	0,  // 4: book_management_system.v1.Book.language:type_name -> book_management_system.v1.Language
+	1,  // 5: book_management_system.v1.BookManagementService.PutBook:input_type -> book_management_system.v1.PutBookRequest
+	3,  // 6: book_management_system.v1.BookManagementService.GetBook:input_type -> book_management_system.v1.GetBookRequest
+	5,  // 7: book_management_system.v1.BookManagementService.GetAllBooks:input_type -> book_management_system.v1.GetAllBooksRequest
+	7,  // 8: book_management_system.v1.BookManagementService.SearchBook:input_type -> book_management_system.v1.SearchBookRequest
+	10, // 9: book_management_system.v1.BookManagementService.RenameBook:input_type -> book_management_system.v1.RenameBookRequest
+	12, // 10: book_management_system.v1.BookManagementService.DeleteBook:input_type -> book_management_system.v1.DeleteBookRequest
+	2,  // 11: book_management_system.v1.BookManagementService.PutBook:output_type -> book_management_system.v1.PutBookResponse
+	4,  // 12: book_management_system.v1.BookManagementService.GetBook:output_type -> book_management_system.v1.GetBookResponse
+	6,  // 13: book_management_system.v1.BookManagementService.GetAllBooks:output_type -> book_management_system.v1.GetAllBooksResponse
+	8,  // 14: book_management_system.v1.BookManagementService.SearchBook:output_type -> book_management_system.v1.SearchBookResponse
+	11, // 15: book_management_system.v1.BookManagementService.RenameBook:output_type -> book_management_system.v1.RenameBookResponse
+	13, // 16: book_management_system.v1.BookManagementService.DeleteBook:output_type -> book_management_system.v1.DeleteBookResponse
+	11, // [11:17] is the sub-list for method output_type
+	5,  // [5:11] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_book_management_system_v1_book_proto_init() }

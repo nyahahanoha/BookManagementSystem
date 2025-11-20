@@ -97,13 +97,14 @@ func main() {
 	for {
 		select {
 		case result := <-ch:
-			if _, err = client.PutBook(ctx, connect.NewRequest(&book_management_systemv1.PutBookRequest{
+			if res, err := client.PutBook(ctx, connect.NewRequest(&book_management_systemv1.PutBookRequest{
 				Isbn: result.ISBN,
 			})); err != nil {
 				logger.Error("failed to put request", slog.String("isbn", result.ISBN), slog.String("error", err.Error()))
 				continue
 			} else {
 				logger.Info("succeeded to put book", slog.String("isbn", result.ISBN))
+				log.Printf("Response Book Info: %+v", res.Msg.GetBook())
 			}
 		case <-sigs:
 			cancel()

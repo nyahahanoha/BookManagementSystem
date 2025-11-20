@@ -110,7 +110,9 @@ func (s *BooksService) PutBook(ctx context.Context, req *connect.Request[book_ma
 		s.lg.Error("failed to put info in store", slog.String("err", err.Error()))
 		return nil, fmt.Errorf("failed to put info in store: %w", err)
 	}
-	return connect.NewResponse(&book_management_systemv1.PutBookResponse{}), nil
+	return connect.NewResponse(&book_management_systemv1.PutBookResponse{
+		Book: convertInfoToProtobuf(*info),
+	}), nil
 }
 
 func convertInfoToProtobuf(info bookscommon.Info) *book_management_systemv1.Book {
