@@ -1,15 +1,13 @@
-# 実行用イメージ（Alpine や Ubuntuなど軽量）
+FROM golang:1.23 AS builder
+WORKDIR /src
+COPY . .
+RUN go build -o bookMgmtSystem main.go
+
 FROM ubuntu:latest
 WORKDIR /app
-
-# ローカルでビルドしたバイナリをコピー
-COPY ./bookMgmtSystem .
+COPY --from=builder /src/bookMgmtSystem .
 COPY ./config.yaml .
-
-# 実行権限を付与
-RUN chmod +x bookMgmtSystem
-RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
-
+RUN chmod +x bookMgmtSystem \
+    && apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 EXPOSE 8080
-
 CMD ["/app/bookMgmtSystem"]
