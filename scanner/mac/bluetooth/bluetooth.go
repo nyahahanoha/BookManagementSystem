@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/BookManagementSystem/scanner/mac/common"
-	"github.com/BookManagementSystem/scanner/mac/config"
 	"github.com/dlclark/regexp2"
+	"github.com/nyahahanoha/BookManagementSystem/scanner/mac/common"
+	"github.com/nyahahanoha/BookManagementSystem/scanner/mac/config"
 	ble "tinygo.org/x/bluetooth"
 )
 

@@ -12,14 +12,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	book_management_systemv1 "github.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1"
-	book_management_systemv1connect "github.com/nyahahanoha/BookManagementSystem/api/book_management_system/v1/book_management_systemv1connect"
-
 	"connectrpc.com/connect"
-	"github.com/BookManagementSystem/scanner/mac/authorization"
-	"github.com/BookManagementSystem/scanner/mac/common"
-	"github.com/BookManagementSystem/scanner/mac/config"
-	"github.com/BookManagementSystem/scanner/mac/scanner"
+	book_management_systemv1 "github.com/nyahahanoha/BookManagementSystem/backend/api/book_management_system/v1"
+	book_management_systemv1connect "github.com/nyahahanoha/BookManagementSystem/backend/api/book_management_system/v1/book_management_systemv1connect"
+	"github.com/nyahahanoha/BookManagementSystem/scanner/mac/authorization"
+	"github.com/nyahahanoha/BookManagementSystem/scanner/mac/common"
+	"github.com/nyahahanoha/BookManagementSystem/scanner/mac/config"
+	"github.com/nyahahanoha/BookManagementSystem/scanner/mac/scanner"
 	"go.yaml.in/yaml/v2"
 )
 

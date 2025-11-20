@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/BookManagementSystem/scanner/mac/bluetooth"
-	"github.com/BookManagementSystem/scanner/mac/common"
-	"github.com/BookManagementSystem/scanner/mac/config"
+	"github.com/nyahahanoha/BookManagementSystem/scanner/mac/bluetooth"
+	"github.com/nyahahanoha/BookManagementSystem/scanner/mac/common"
+	"github.com/nyahahanoha/BookManagementSystem/scanner/mac/config"
 )
 
 type Scanner interface {
