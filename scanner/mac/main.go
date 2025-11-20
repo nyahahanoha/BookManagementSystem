@@ -65,6 +65,9 @@ func main() {
 	callInfo.RequestHeader().Set("Authorization", "Pomerium "+token)
 
 	go func() {
+		if !cfg.Bluetooth.Enabled {
+			return
+		}
 		scanner, err := scanner.NewScanner(logger, cfg)
 		if err != nil {
 			log.Fatalf("failed to create scanner: %v", err)
