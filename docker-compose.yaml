@@ -49,7 +49,7 @@ services:
     expose:
       - 8000
   certbot:
-    image: certbot/certbot:latest
+    image: certbot/dns-cloudflare:latest
     container_name: certbot
     entrypoint: 
       - /bin/sh
